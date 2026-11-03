@@ -32,8 +32,10 @@ export function komendeWoensdag() {
 export const CONFIG = {
   club: 'Arnhemse Boys',
   blocks: [
-    { id: 'b1', label: 'Blok 1', start: '08:00', end: '11:00', tasks: ['Bar', 'Keuken'] },
-    { id: 'b2', label: 'Blok 2', start: '11:00', end: '14:00', tasks: ['Bar', 'Keuken'] },
+    // sinds november 2026: per blok één soort dienst, twee plekken,
+    // waarvan de eerste verplicht is
+    { id: 'b1', label: 'Blok 1', start: '08:00', end: '11:00', tasks: ['Bar (verplicht)', 'Bar (optioneel)'] },
+    { id: 'b2', label: 'Blok 2', start: '11:00', end: '14:00', tasks: ['Bar (verplicht)', 'Bar (optioneel)'] },
   ],
   bar_shifts: [
     { id: 'v1', label: 'Ochtend', start: '07:30', end: '12:00' },

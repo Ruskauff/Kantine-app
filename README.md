@@ -60,6 +60,10 @@ Draai je in een omgeving die al een Chromium klaar heeft staan, zet dan
   teamcode wordt ook bewaard als er nog geen regel voor dat team bestond.
 - `ruilen.spec.mjs` — de hele route: team vraagt, ander team gaat akkoord,
   coördinator bevestigt. Pas na die derde stap wisselt de dienstdag echt.
+- `dienstdag.spec.mjs` — de opzet sinds november 2026: per blok twee plekken
+  waarvan alleen de eerste verplicht is, het stoplicht, de markering van de
+  eerstvolgende zaterdag, en dat het kaderlid de vaste bar-krachten niet ziet
+  maar de coördinator wel.
 - `veiligheid.spec.mjs` — dat ingetypte scripttekst gewoon tekst blijft, dat
   tijdelijke wachtwoorden niet te raden zijn, en wie welke namen mag weghalen.
 
@@ -84,8 +88,9 @@ zijn.
 
 ## Nog te doen
 
-- `sql/rooster-najaar-2026.sql` is nog niet uitgevoerd, en de datums erin zijn
-  verlopen — die moeten eerst opnieuw gezet worden.
+- `sql/rooster-pilot-2026.sql` is nog niet uitgevoerd. Het vult 7 november
+  t/m 12 december voor JO10 t/m JO15 en MO10 t/m MO15. Let op: het wist eerst
+  alles, dus voer eerst alleen deel A uit.
 - Het subdomein `kantine.arnhemseboys.nl` is nog niet gekoppeld. Het DNS van
   `arnhemseboys.nl` zit niet bij Netlify of Cloudflare maar bij de hoster van
   de clubsite; daar is één CNAME-regel nodig.

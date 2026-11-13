@@ -339,7 +339,8 @@ function normTel(p){
 }
 /* +31612345678 -> 06 1234 5678; andere nummers ongewijzigd */
 function fmtTel(t){if(!t)return '';if(/^\+316\d{8}$/.test(t))return '06 '+t.slice(4,8)+' '+t.slice(8);if(/^\+31\d{9}$/.test(t))return '0'+t.slice(3);return t;}
-function waLink(tel,tekst){return 'https://wa.me/'+String(tel).replace(/^\+/,'')+(tekst?'?text='+encodeURIComponent(tekst):'');}
+/* zonder nummer laat WhatsApp je zelf de chat of groep kiezen */
+function waLink(tel,tekst){return 'https://wa.me/'+String(tel||'').replace(/^\+/,'')+(tekst?'?text='+encodeURIComponent(tekst):'');}
 /* "?&body=" werkt op zowel iPhone als Android */
 function smsLink(tel,tekst){return 'sms:'+tel+(tekst?'?&body='+encodeURIComponent(tekst):'');}
 function telKnoppen(tel,tekst){
@@ -359,6 +360,12 @@ function berichtOpenDienst(s,team){
     +(open.length?open.join(', '):'—')+'. Wil je ze invullen in de app? '+APP_URL;
 }
 function berichtAlgemeen(naam){return 'Hoi '+(naam||'')+', ';}
+/* teamleider -> eigen teamgroep: welke blokken nog open staan */
+function berichtTeamapp(s,team){
+  const open=dayBlocks(s).filter(b=>!blokTelling(s,b).rond).map(b=>b.label+' ('+b.start+'–'+b.end+')');
+  return capF(fmtDay(s.date))+' hebben wij ('+team+') kantinedienst. Nog open: '
+    +(open.length?open.join(', '):'—')+'. Wie kan? Laat het me weten, dan zet ik je erin.';
+}
 
 /* ---------- Sessie / login ---------- */
 let session=null; // {kind:'team',code,teamId,teamName} of {kind:'account',at,rt,exp,uid,role,name}
@@ -509,6 +516,15 @@ function satCard(s,eerstvolgend){
   // ---- voortgang op de verplichte plekken ----
   const pr=el('div','progress');const bar=el('i');pr.appendChild(bar);c.appendChild(pr);
   const lbl=el('div','prlabel');c.appendChild(lbl);
+  // ---- delen in de teamapp: het bericht staat klaar, de teamleider kiest de groep ----
+  const deel=el('a','telbtn wa deelteam');deel.textContent='📣 Deel in de teamapp';deel.target='_blank';deel.rel='noopener';
+  deel.style.margin='2px 0 8px';
+  deel.onclick=async e=>{
+    const tekst=berichtTeamapp(s,session.teamName);
+    deel.href=waLink('',tekst);
+    if(navigator.share){e.preventDefault();try{await navigator.share({text:tekst});}catch(err){/* geannuleerd */}}
+  };
+  if(komend(s))c.appendChild(deel);
   function updateProgress(){
     const t=dagTelling(s);
     bar.style.width=(t.vTotaal?Math.round(t.vGedaan/t.vTotaal*100):0)+'%';
@@ -518,6 +534,8 @@ function satCard(s,eerstvolgend){
       :t.vGedaan+'/'+t.vTotaal+' verplichte plekken ingevuld';
     c.classList.toggle('rond',t.rond);
     c.classList.toggle('nogopen',!t.rond);
+    deel.style.display=t.rond?'none':'';
+    deel.href=waLink('',berichtTeamapp(s,session.teamName));
   }
   updateProgress();
   // ---- blokken met afvinken ----

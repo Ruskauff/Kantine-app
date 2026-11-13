@@ -63,7 +63,10 @@ test('een teamleider ziet nooit de nummers van anderen', async ({ page }) => {
   await expect(page.locator('#teamTel')).toContainText('06 1111 2222');
   // geen overzicht van anderen, geen app-knoppen, geen tabblad Contact
   expect(s.rpc.filter((r) => r.fn === 'contact_list')).toHaveLength(0);
-  await expect(page.locator('a.telbtn')).toHaveCount(0);
+  await expect(page.locator('a.telbtn:not(.deelteam)')).toHaveCount(0);
+  // de deelknop bevat geen nummer: de teamleider kiest zelf de groep
+  for (const h of await page.locator('a.deelteam').evaluateAll((els) => els.map((e) => e.getAttribute('href'))))
+    expect(h).toMatch(/^https:\/\/wa\.me\/\?text=/);
   await expect(page.locator('#navbar')).toBeHidden();
 });
 
@@ -365,4 +368,28 @@ test('import: een ander soort bestand slepen wordt geweigerd', async ({ page }) 
   });
   await expect(page.locator('#saving')).toContainText('Alleen Excel');
   await expect(page.locator('#importKaart')).toBeVisible();
+});
+
+test('teamleider: "Deel in de teamapp" zet een bericht met de open blokken klaar', async ({ page }) => {
+  const s = stand();
+  await nepDatabase(page, s);
+  await logInAlsTeam(page);
+  const knop = page.locator('a.deelteam').first();
+  await expect(knop).toBeVisible();
+  const href = await knop.getAttribute('href');
+  expect(href).toMatch(/^https:\/\/wa\.me\/\?text=/);   // geen nummer: zelf de groep kiezen
+  const tekst = decodeURIComponent(href.split('text=')[1]);
+  expect(tekst).toContain('JO11-1');
+  expect(tekst).toContain('Blok 1 (08:00–11:00)');
+  expect(tekst).toContain('Blok 2 (11:00–14:00)');
+
+  // blok 1 invullen: het bericht noemt alleen nog blok 2
+  await page.locator('.sat .block').first().locator('input[type=checkbox]').first().check();
+  const na = decodeURIComponent((await knop.getAttribute('href')).split('text=')[1]);
+  expect(na).not.toContain('Blok 1');
+  expect(na).toContain('Blok 2');
+
+  // alles rond: de knop verdwijnt
+  await page.locator('.sat .block').nth(1).locator('input[type=checkbox]').first().check();
+  await expect(knop).toBeHidden();
 });

@@ -354,13 +354,28 @@ function telKnoppen(tel,tekst){
   return w;
 }
 /* Standaardberichten — de definitieve teksten volgen nog. */
-const APP_URL=location.origin;
+/* ---------- Berichtteksten (vastgesteld 13-11-2026) ----------
+   Toon: "Hoi" en je/jij. Onder berichten van de coördinator komt de naam van
+   wie ingelogd is. Het adres is dat van de pagina zelf, dus na het koppelen
+   van kantine.arnhemseboys.nl staat dat er vanzelf in. */
+const APP_ADRES=location.host;
+const voornaam=n=>String(n||'').trim().split(/\s+/)[0]||'';
+function afzenderNaam(){return session&&session.kind==='account'?voornaam(session.name):'';}
+function afzenderFunctie(){return session&&session.role==='barco'?'barcoördinator':'kantinecommissie';}
+function afzender(){const n=afzenderNaam();return n?'Groet, '+n+' — '+afzenderFunctie()+' Arnhemse Boys':'';}
+const regels=a=>a.filter(x=>x!==''&&x!=null).join('\n');
 function berichtOpenDienst(s,team){
-  const open=dayBlocks(s).filter(b=>!blokTelling(s,b).rond).map(b=>b.label+' ('+b.start+'–'+b.end+')');
-  return 'Hoi, voor '+fmtDay(s.date)+' staan bij '+team+' nog plekken open in de kantine: '
-    +(open.length?open.join(', '):'—')+'. Wil je ze invullen in de app? '+APP_URL;
+  const {verplicht}=openPlekken(s);
+  return regels([
+    'Hoi! '+capF(fmtDay(s.date))+' heeft '+team+' kantinedienst en er staat nog open:',
+    ...(verplicht.length?verplicht:['• (alleen nog extra plekken)']),
+    'Wil je de namen in de app zetten? '+APP_ADRES,
+    afzender()]);
 }
-function berichtAlgemeen(naam){return 'Hoi '+(naam||'')+', ';}
+function berichtAlgemeen(naam){
+  const n=afzenderNaam();
+  return 'Hoi'+(naam?' '+naam:'')+', '+(n?'met '+n+', '+afzenderFunctie()+' van Arnhemse Boys. ':'');
+}
 /* teamleider -> eigen teamgroep: de open verplichte plekken als lijst,
    de open optionele plekken in één regel "extra hulp welkom" */
 const lijstNL=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+' en '+a[a.length-1];
@@ -390,7 +405,7 @@ function berichtNoodoproep(s){
   const {verplicht}=openPlekken(s);
   return ['Hoi, een noodoproep voor de kantine van Arnhemse Boys.',
     capF(fmtDay(s.date))+' zijn er nog plekken open'+(verplicht.length?':':'.'),...verplicht,
-    'Kan iemand uit jullie team helpen? Laat het me even weten. Alvast bedankt!'].join('\n');
+    'Kan iemand uit jullie team helpen? Laat het me even weten. Alvast bedankt!',afzender()].filter(Boolean).join('\n');
 }
 
 /* ---------- Welke teams draaien kantinedienst ----------
@@ -426,7 +441,7 @@ function berichtRooster(staffId,naam){
   if(!d.length)return 'Hoi '+voor+', je staat op dit moment niet ingedeeld voor de bar.';
   return ['Hoi '+voor+', je staat ingedeeld voor de bar:',
     ...d.map(x=>'• '+fmtShort(x.s.date)+(x.s.label?' ('+x.s.label+')':'')+' — '+x.sh.label+' '+x.sh.start+'–'+x.sh.end),
-    'Kun je een keer niet? Laat het me weten.'].join('\n');
+    'Kun je een keer niet? Laat het me weten.',afzender()].filter(Boolean).join('\n');
 }
 /* groepsbericht: per zaterdag wie er staat en wat er nog open is */
 function berichtBarrooster(){
@@ -1697,7 +1712,7 @@ function contactRegel(r){
     catch(e){saved('Niet opgeslagen: '+e.message,true);inp.value=fmtTel(r.telefoon);}
   };
   rechts.appendChild(inp);
-  const groet=r.kind==='team'?'teamleider van '+r.naam:(r.naam||'').split(' ')[0];
+  const groet=r.kind==='team'?'':voornaam(r.naam);
   rechts.appendChild(telKnoppen(r.telefoon,berichtAlgemeen(groet)));
   if(r.kind==='staff'){
     const n=dienstenVan(r.ref_id).length;

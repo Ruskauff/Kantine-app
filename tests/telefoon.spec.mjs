@@ -536,3 +536,46 @@ test('noodoproep: teamleiders buiten het rooster één voor één, met wat er op
   await kaart.getByRole('button', { name: 'Overslaan' }).click();
   await expect(kaart).toContainText('2 van 2: teamleider JO17-1');
 });
+
+// ---------- Berichtteksten (vastgesteld 13-11-2026) ----------
+
+test('berichten: coördinator naar teamleider, met open plekken, adres en afzender', async ({ page }) => {
+  const s = stand({ rol: 'barco', contacts: CONTACTEN,
+    saturdays: [{ id: 's1', date: dag(7), team_id: 't1', team_status: { b1: [{ done: true, name: 'A' }, { done: false, name: '' }] }, label: '', blocks: null, bar_shifts: null }] });
+  await nepDatabase(page, s);
+  await logInMetAccount(page);
+  await page.locator('.sathead').first().click();
+  const t = decodeURIComponent((await page.locator('.contactrij a.telbtn.wa').getAttribute('href')).split('text=')[1]).split('\n');
+  expect(t[0]).toMatch(/^Hoi! .+ heeft JO11-1 kantinedienst en er staat nog open:$/);
+  expect(t).toContain('• Blok 2 (11:00–14:00): bar');
+  expect(t.some((r) => r.startsWith('• Blok 1'))).toBe(false);
+  expect(t).toContain('Wil je de namen in de app zetten? 127.0.0.1:4173');
+  expect(t.at(-1)).toBe('Groet, Wito — barcoördinator Arnhemse Boys');
+});
+
+test('berichten: algemeen bericht uit Contact, en de beheerder tekent als kantinecommissie', async ({ page }) => {
+  const s = stand({ rol: 'admin', contacts: CONTACTEN });
+  await nepDatabase(page, s);
+  await logInMetAccount(page);
+  await naarTab(page, 'contact');
+  const staff = decodeURIComponent((await page.locator('.list-item[data-ref="p2"] a.telbtn.wa').first().getAttribute('href')).split('text=')[1]);
+  expect(staff).toBe('Hoi Els, met Wito, kantinecommissie van Arnhemse Boys. ');
+  const team = decodeURIComponent((await page.locator('.list-item[data-ref="t1"] a.telbtn.wa').first().getAttribute('href')).split('text=')[1]);
+  expect(team).toBe('Hoi, met Wito, kantinecommissie van Arnhemse Boys. ');
+});
+
+test('berichten: persoonlijk rooster en noodoproep eindigen met de afzender', async ({ page }) => {
+  await page.goto('/');
+  const [rooster, nood] = await page.evaluate(() => {
+    session = { kind: 'account', role: 'barco', name: 'Leonne Wiekstra' };
+    config = { blocks: [{ id: 'b1', label: 'Blok 1', start: '08:00', end: '11:00', tasks: ['Bar (verplicht)'] }], bar_shifts: [{ id: 'v1', label: 'Ochtend', start: '07:30', end: '12:00' }] };
+    const d = new Date(); d.setDate(d.getDate() + 7);
+    const iso = d.toISOString().slice(0, 10);
+    data = { saturdays: [{ id: 's1', date: iso, team_status: {}, bar: { v1: ['p2'] } }], barStaff: [], teams: [] };
+    return [berichtRooster('p2', 'Els Bakker'), berichtNoodoproep(data.saturdays[0])];
+  });
+  expect(rooster.split('\n').at(-1)).toBe('Groet, Leonne — barcoördinator Arnhemse Boys');
+  expect(rooster.split('\n')[0]).toBe('Hoi Els, je staat ingedeeld voor de bar:');
+  expect(nood.split('\n').at(-1)).toBe('Groet, Leonne — barcoördinator Arnhemse Boys');
+  expect(nood).toContain('• Blok 1 (08:00–11:00): bar');
+});

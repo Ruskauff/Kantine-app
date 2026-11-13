@@ -137,8 +137,12 @@ Teamleiders gaan op dezelfde manier: een kolom **Team** en bij **Rol**
 "JO10-1" worden als hetzelfde team gezien. Per team is er één nummer; een
 tweede teamleider van hetzelfde team wordt overgeslagen.
 
-De standaardteksten van de berichten (`berichtOpenDienst` en `berichtAlgemeen`
-in `index.html`) zijn nog voorlopig.
+De berichtteksten zijn vastgesteld op 13-11-2026 en staan bij elkaar in
+`index.html` (zoek op "Berichtteksten"): toon "Hoi" en je/jij, onder
+berichten van de coördinator de voornaam van wie ingelogd is met
+"barcoördinator" (rol barco) of "kantinecommissie" (rol beheerder), en het
+adres van de app zelf (`location.host`) — na het koppelen van
+kantine.arnhemseboys.nl staat dat er vanzelf in.
 
 ## Nog te doen
 

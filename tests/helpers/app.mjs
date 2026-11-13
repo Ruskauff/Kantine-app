@@ -68,6 +68,9 @@ export function stand(extra = {}) {
     adminSwaps: [],        // antwoord op swap_admin_list
     teamCodePatchLeeg: false, // doet alsof er nog geen coderegel bestaat
     weigerDatum: null,     // deze datum geeft een 409 bij het aanmaken
+    teamTel: '',           // antwoord op team_get_phone
+    contacts: [],          // antwoord op contact_list
+    geenTelefoonMigratie: false, // doet alsof sql/telefoon-migratie.sql nog niet gedraaid is
     posts: [], patches: [], deletes: [], rpc: [], signups: [],
     ...extra,
   };
@@ -120,6 +123,15 @@ export async function nepDatabase(page, s) {
         case 'team_swap_respond': return json([{ ok: true }]);
         case 'swap_admin_list': return json(s.adminSwaps);
         case 'swap_decide': return json([{ ok: true }]);
+        // telefoonnummers (sql/telefoon-migratie.sql)
+        case 'team_get_phone':
+          if (s.geenTelefoonMigratie) return json({ message: 'function not found' }, 404);
+          return json(s.teamTel ?? '');
+        case 'team_set_phone': s.teamTel = body.p_phone; return json(body.p_phone);
+        case 'contact_list':
+          if (s.geenTelefoonMigratie) return json({ message: 'function not found' }, 404);
+          return json(s.contacts);
+        case 'contact_set': return json(body.p_phone);
         default: return json([]);
       }
     }

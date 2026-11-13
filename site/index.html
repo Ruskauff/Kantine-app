@@ -1472,6 +1472,7 @@ function renderContactTab(){
     b.onclick=async()=>{b.disabled=true;await laadContacten();renderContactTab();};
     c.appendChild(b);wrap.appendChild(c);return;
   }
+  if(importVoorbeeld){renderImportVoorbeeld(wrap);return;}
   // ---- filters (blijven staan tijdens het typen) ----
   const fb=el('div','filterbar');
   const mkSel=(label,opts,key)=>{const w=el('label','fitem');w.appendChild(Object.assign(el('span'),{textContent:label}));
@@ -1490,6 +1491,7 @@ function renderContactTab(){
   wrap.appendChild(zl);
   const tel=el('div','muted');tel.style.cssText='font-size:12.5px;margin:2px 0 10px';wrap.appendChild(tel);
   const lijst=el('div');wrap.appendChild(lijst);
+  wrap.appendChild(importKaart());
   function tekenLijst(){
     const q=cf.zoek.trim().toLowerCase();
     let rows=data.contacts.slice();
@@ -1535,6 +1537,132 @@ function contactRegel(r){
   rechts.appendChild(telKnoppen(r.telefoon,berichtAlgemeen(groet)));
   row.appendChild(rechts);
   return row;
+}
+/* ---------- Nummers bijwerken uit Excel ----------
+   Leest de Excel met barvrijwilligers (of een CSV) en koppelt de namen aan
+   vaste krachten en coördinatoren: eerst op volledige naam, anders op
+   roepnaam als die zowel in de app als in het bestand maar één keer voorkomt.
+   Niets wordt opgeslagen voordat je het overzicht hebt gezien. */
+const IMP_SKIP=/niet meer actief|verlaten|gestopt/i;
+const naamSleutel=s=>String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
+function koppelImport(rijen,contacten){
+  const kand=(contacten||[]).filter(c=>c.kind==='staff'||c.kind==='profile');
+  const perNaam=new Map();kand.forEach(c=>{const k=naamSleutel(c.naam);if(!perNaam.has(k))perNaam.set(k,[]);perNaam.get(k).push(c);});
+  const regels=rijen.map((r,i)=>{
+    const roep=String(r.roepnaam||'').trim();
+    const naam=String(r.naam||r.name||[r.roepnaam,r.tv||r.tussenvoegsel,r.achternaam].filter(Boolean).join(' ')).replace(/\s+/g,' ').trim();
+    const ruw=r.telefoon||r.telefoonnummer||r.tel||r.mobiel||r['mobiel nummer']||'';
+    const knvb=String(r['knvb bondsnummer']||r.knvb||r.bondsnummer||'').trim();
+    const functie=String(r.functie||'').trim(), inzet=String(r.inzetbaar||'').trim();
+    return {rij:i+2,naam,roep:roep||naam.split(' ')[0]||'',functie,inzet,ruw:String(ruw),telefoon:normTel(ruw),knvb};
+  }).filter(x=>x.naam);
+  const roepTel=new Map();regels.forEach(x=>{const k=naamSleutel(x.roep);roepTel.set(k,(roepTel.get(k)||0)+1);});
+  return regels.map(x=>{
+    const o={...x,status:'',reden:'',match:null,aan:false,toevoegen:false};
+    if(IMP_SKIP.test(x.inzet)){o.status='overslaan';o.reden='inzetbaar: '+x.inzet;return o;}
+    if(!x.telefoon){o.status='overslaan';o.reden=x.ruw?'telefoonnummer klopt niet':'geen telefoonnummer';return o;}
+    let m=perNaam.get(naamSleutel(x.naam))||[];
+    if(!m.length&&roepTel.get(naamSleutel(x.roep))===1)m=perNaam.get(naamSleutel(x.roep))||[];
+    // dezelfde naam als vaste kracht én als coördinator is één persoon in twee rollen;
+    // twee keer dezelfde soort is echt dubbel
+    if(new Set(m.map(c=>c.kind)).size<m.length){o.status='dubbel';o.reden='meerdere mensen met deze naam in de app';return o;}
+    if(!m.length){o.status='geen';o.reden='niet gevonden in de app';return o;}
+    o.match=m[0];o.matches=m;o.status='koppel';
+    if(m.every(c=>c.telefoon===x.telefoon)){o.status='gelijk';o.reden='nummer is al gelijk';return o;}
+    const zelf=m.find(c=>c.telefoon&&c.telefoon!==x.telefoon&&c.bron==='app');
+    if(zelf){o.reden='in de app ingevuld: '+fmtTel(zelf.telefoon)+' — blijft staan tenzij je aanvinkt';return o;}
+    if(/jeugd/i.test(x.functie)){o.reden='jeugdpoule — alleen aanvinken als dat de bedoeling is';return o;}
+    o.aan=true;return o;
+  });
+}
+let importVoorbeeld=null;
+function importKaart(){
+  const c=el('div','card');c.id='importKaart';
+  c.innerHTML='<h3>Nummers bijwerken uit Excel</h3><p class="muted" style="margin:0 0 8px;font-size:12.5px">Bijvoorbeeld de lijst met barvrijwilligers. Kolommen: <b>Roepnaam</b>, <b>Tv</b>, <b>Achternaam</b> (of één kolom <b>Naam</b>) en <b>Telefoon</b>. <b>KNVB bondsnummer</b> en <b>inzetbaar</b> worden meegenomen als ze er zijn. Je ziet eerst wat er gebeurt; pas daarna wordt er iets opgeslagen.</p>';
+  const r=el('div','row');
+  const fi=el('input');fi.type='file';fi.accept='.xlsx,.xls,.csv';
+  const b=el('button','btn sm');b.textContent='Inlezen';
+  b.onclick=async()=>{
+    if(!fi.files||!fi.files[0]){saved('Kies een bestand',true);return;}
+    b.disabled=true;b.textContent='Bezig…';
+    try{
+      const rijen=await parseSheet(fi.files[0]);
+      if(!rijen.length)throw new Error('geen rijen gevonden');
+      importVoorbeeld={bestand:fi.files[0].name,regels:koppelImport(rijen,data.contacts)};
+      renderContactTab();window.scrollTo(0,0);
+    }catch(e){saved('Inlezen mislukt: '+e.message,true);b.disabled=false;b.textContent='Inlezen';}
+  };
+  r.appendChild(fi);r.appendChild(b);c.appendChild(r);
+  return c;
+}
+function renderImportVoorbeeld(wrap){
+  const v=importVoorbeeld,R=v.regels,admin=session.role==='admin';
+  const groep=st=>R.filter(x=>x.status===st);
+  const telAan=()=>R.filter(x=>x.aan).length+R.filter(x=>x.toevoegen).length;
+  const kop=el('div','card');
+  kop.innerHTML=`<h3>Overzicht: ${escapeHtml(v.bestand)}</h3>`;
+  kop.appendChild(Object.assign(el('p','muted'),{style:'margin:0;font-size:12.5px',
+    textContent:`${groep('koppel').length} gekoppeld · ${groep('gelijk').length} al gelijk · ${groep('geen').length+groep('dubbel').length} niet gevonden · ${groep('overslaan').length} overgeslagen`}));
+  wrap.appendChild(kop);
+  const knoppen=el('div','row');knoppen.style.margin='4px 0 12px';
+  const ok=el('button','btn');const ann=el('button','btn ghost');ann.textContent='Annuleren';
+  const zetTekst=()=>{const n=telAan();ok.textContent=n?`Opslaan (${n})`:'Niets geselecteerd';ok.disabled=!n;};
+  ann.onclick=()=>{importVoorbeeld=null;renderContactTab();};
+  ok.onclick=async()=>{ok.disabled=true;ok.textContent='Bezig…';try{await importOpslaan();}catch(e){saved('Opslaan mislukt: '+e.message,true);zetTekst();}};
+  knoppen.appendChild(ok);knoppen.appendChild(ann);wrap.appendChild(knoppen);
+  const sectie=(titel,rijen,vinkbaar)=>{
+    if(!rijen.length)return;
+    const c=el('div','card');c.appendChild(Object.assign(el('h3'),{textContent:titel+' ('+rijen.length+')'}));
+    const vinkVeld=x=>vinkbaar==='koppel'?'aan':(vinkbaar==='toevoegen'&&x.status==='geen')?'toevoegen':null;
+    const vinkRijen=rijen.filter(vinkVeld);
+    if(vinkRijen.length>1){
+      const alles=el('button','btn ghost sm');alles.style.marginBottom='6px';
+      const zet=()=>{alles.textContent=vinkRijen.every(x=>x[vinkVeld(x)])?'Alles uitvinken':'Alles aanvinken';};
+      alles.onclick=()=>{const aan=!vinkRijen.every(x=>x[vinkVeld(x)]);vinkRijen.forEach(x=>x[vinkVeld(x)]=aan);
+        c.querySelectorAll('.imprij input[type=checkbox]').forEach(cb=>cb.checked=aan);zet();zetTekst();};
+      zet();c.appendChild(alles);
+    }
+    rijen.forEach(x=>{
+      const row=el('div','list-item imprij');row.dataset.rij=x.rij;row.dataset.status=x.status;
+      const l=el('div');
+      l.appendChild(Object.assign(el('b'),{textContent:x.naam}));
+      const sub=[x.functie,x.telefoon?fmtTel(x.telefoon):''].filter(Boolean).join(' · ');
+      if(sub)l.appendChild(Object.assign(el('div','contacttype'),{textContent:sub}));
+      if(x.match&&naamSleutel(x.match.naam)!==naamSleutel(x.naam))l.appendChild(Object.assign(el('div','contacttype'),{textContent:'→ '+x.match.naam+' (op roepnaam)'}));
+      if(x.reden)l.appendChild(Object.assign(el('div','geennr'),{textContent:x.reden}));
+      row.appendChild(l);
+      const veld=vinkVeld(x);
+      if(veld){
+        const lab=el('label','row');const cb=el('input');cb.type='checkbox';cb.checked=x[veld];cb.style.width='20px';cb.style.height='20px';
+        cb.onchange=()=>{x[veld]=cb.checked;zetTekst();};
+        lab.appendChild(cb);lab.appendChild(Object.assign(el('span','muted'),{textContent:veld==='aan'?'bijwerken':'toevoegen als vaste kracht',style:'font-size:12px'}));
+        row.appendChild(lab);
+      }
+      c.appendChild(row);
+    });
+    wrap.appendChild(c);
+  };
+  sectie('Gekoppeld',groep('koppel'),'koppel');
+  sectie('Niet gevonden',[...groep('geen'),...groep('dubbel')],admin?'toevoegen':null);
+  if(!admin&&groep('geen').length)wrap.appendChild(Object.assign(el('p','muted'),{style:'font-size:12.5px;margin:-4px 0 12px',textContent:'Iemand nieuw als vaste kracht toevoegen kan alleen de beheerder.'}));
+  sectie('Al gelijk',groep('gelijk'),null);
+  sectie('Overgeslagen',groep('overslaan'),null);
+  zetTekst();
+}
+async function importOpslaan(){
+  const R=importVoorbeeld.regels;
+  // nieuwe vaste krachten eerst aanmaken, dan hebben ze een id
+  for(const x of R.filter(y=>y.toevoegen&&!y.match)){
+    const r=await sbSend('POST','bar_staff',{name:x.naam},{Prefer:'return=representation'});
+    const rows=await r.json();const id=rows[0].id;
+    data.barStaff.push({id,name:x.naam,user_id:null});
+    x.match={kind:'staff',ref_id:String(id),naam:x.naam};x.matches=[x.match];x.aan=true;
+  }
+  const rows=R.filter(x=>x.aan&&x.matches).flatMap(x=>x.matches.map(m=>({kind:m.kind,ref_id:m.ref_id,telefoon:x.telefoon,knvb:x.knvb})));
+  const n=rows.length?await authRpc('contact_import',{p_rows:rows}):0;
+  importVoorbeeld=null;
+  await laadContacten();renderContactTab();
+  saved(n+' nummer'+(n===1?'':'s')+' opgeslagen ✓');
 }
 function renderMijnTab(){
   const wrap=$('#content');wrap.innerHTML='';

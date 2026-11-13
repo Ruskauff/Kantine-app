@@ -11,7 +11,7 @@ MO-teams in dezelfde leeftijden).
 | `site/` | De app zelf. Dit is wat er online staat — één `index.html` met alles erin, plus de iconen en de instellingen voor de webhosting. |
 | `sql/` | Scripts voor de database bij Supabase. Draaien doe je in de SQL-editor van Supabase, niet vanaf hier. |
 | `tests/` | De controles op de app. Zie hieronder. |
-| `tools/` | Een kleine webserver om `site/` lokaal te openen, en `import-telefoons.py` om telefoonnummers uit de Excel met barvrijwilligers klaar te zetten. |
+| `tools/` | Een kleine webserver om `site/` lokaal te openen. |
 
 ## De app bekijken
 
@@ -68,7 +68,8 @@ Draai je in een omgeving die al een Chromium klaar heeft staan, zet dan
   tijdelijke wachtwoorden niet te raden zijn, en wie welke namen mag weghalen.
 - `telefoon.spec.mjs` — telefoonnummers: omzetten naar +31-vorm, de WhatsApp-
   en sms-links, de teamleider die alleen zijn eigen nummer ziet, het tabblad
-  Contact, en dat de app blijft werken als de migratie nog niet gedraaid is.
+  Contact, de import uit Excel, en dat de app blijft werken als de migratie
+  nog niet gedraaid is.
 
 Bij elke push draaien ze ook op GitHub, zie het tabblad **Actions**.
 
@@ -106,14 +107,18 @@ De nummers staan in een eigen tabel `contacts`, niet in `teams`, `bar_staff`
 of `profiles`: die tabellen kan iedere vaste kracht lezen. Alleen coördinator
 en beheerder kunnen de nummers zien, via de functie `contact_list`.
 
-In gebruik nemen:
+In gebruik nemen: `sql/telefoon-migratie.sql` uitvoeren in Supabase. Het
+script mag opnieuw gedraaid worden; doe dat ook na een wijziging erin.
 
-1. `sql/telefoon-migratie.sql` uitvoeren in Supabase.
-2. Nummers uit de Excel klaarzetten:
-   `python3 tools/import-telefoons.py "…/Barvrijwilligers 2026-2027.xlsx"`.
-   Het SQL-bestand komt naast de Excel te staan, niet in deze repo — er staan
-   telefoonnummers in. Voer daarin eerst deel A uit en kijk wie gekoppeld
-   wordt, dan deel B, dan deel C. Gooi het bestand daarna weg.
+Nummers bijwerken uit Excel (bijvoorbeeld de lijst met barvrijwilligers) kan
+in het tabblad Contact, onderaan. De app koppelt de namen aan vaste krachten
+en coördinatoren — eerst op volledige naam, anders op roepnaam als die maar
+één keer voorkomt — en laat eerst een overzicht zien. Pas na "Opslaan" wordt
+er iets weggeschreven, via de functie `contact_import`. Nummers die in de app
+zelf zijn ingevuld blijven staan, tenzij je ze aanvinkt. Wie niet gevonden
+wordt kan de beheerder meteen als vaste kracht toevoegen. Regels met
+"niet meer actief" of "verlaten" in de kolom inzetbaar worden overgeslagen;
+de jeugdpoule staat standaard uit.
 
 De standaardteksten van de berichten (`berichtOpenDienst` en `berichtAlgemeen`
 in `index.html`) zijn nog voorlopig.

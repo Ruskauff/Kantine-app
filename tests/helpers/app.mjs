@@ -132,6 +132,7 @@ export async function nepDatabase(page, s) {
           if (s.geenTelefoonMigratie) return json({ message: 'function not found' }, 404);
           return json(s.contacts);
         case 'contact_set': return json(body.p_phone);
+        case 'contact_import': return json((body.p_rows || []).length);
         default: return json([]);
       }
     }
@@ -140,7 +141,10 @@ export async function nepDatabase(page, s) {
     if (url.includes('/rest/v1/profiles?select=name,role')) return json([{ name: 'Wito', role: s.rol }]);
     if (url.includes('/rest/v1/profiles')) return json([{ id: 'u1', name: 'Wito', role: s.rol }]);
     if (url.includes('/rest/v1/teams')) return json(s.teams);
-    if (url.includes('/rest/v1/bar_staff')) return json(s.barStaff);
+    if (url.includes('/rest/v1/bar_staff')) {
+      if (m === 'POST') { s.posts.push({ tabel: 'bar_staff', body }); return json([{ id: 'nieuw' + s.posts.length, ...body }], 201); }
+      return json(s.barStaff);
+    }
 
     if (url.includes('/rest/v1/team_codes')) {
       if (m === 'PATCH') { s.patches.push({ tabel: 'team_codes', url, body }); return json(s.teamCodePatchLeeg ? [] : [{ team_id: 't1', code: body.code }]); }

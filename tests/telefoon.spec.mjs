@@ -121,7 +121,7 @@ test('het tabblad Contact toont iedereen, met wie nog geen nummer heeft', async 
   await naarTab(page, 'contact');
 
   await expect(page.locator('#content')).toContainText('2 van 5 hebben een nummer');
-  await expect(page.locator('#content h3')).toHaveText(['Coördinatoren', 'Vaste krachten', 'Teamleiders']);
+  await expect(page.locator('#content .card:not(#importKaart) h3')).toHaveText(['Coördinatoren', 'Vaste krachten', 'Teamleiders']);
 
   await page.getByText('Alleen wie nog geen nummer heeft').click();
   await expect(page.locator('#content .list-item')).toHaveCount(3);
@@ -162,4 +162,141 @@ test('zonder de nieuwe database-functies meldt Contact wat er ontbreekt', async 
   await logInMetAccount(page);
   await naarTab(page, 'contact');
   await expect(page.locator('#content')).toContainText('telefoon-migratie.sql');
+});
+
+// ---------- Nummers bijwerken uit Excel (in het tabblad Contact) ----------
+
+const IMPORT_CONTACTEN = [
+  { kind: 'staff', ref_id: 'p1', naam: 'Leonne Wiekstra', groep: 'Vaste kracht', telefoon: '', knvb: '', bron: '' },
+  { kind: 'staff', ref_id: 'p2', naam: 'Inge', groep: 'Vaste kracht', telefoon: '', knvb: '', bron: '' },
+  { kind: 'staff', ref_id: 'p3', naam: 'Kees Phielix', groep: 'Vaste kracht', telefoon: '+31600000000', knvb: '', bron: 'app' },
+  { kind: 'staff', ref_id: 'p4', naam: 'Sanne Wiekstra', groep: 'Vaste kracht', telefoon: '', knvb: '', bron: '' },
+  { kind: 'staff', ref_id: 'p5', naam: 'Dolf', groep: 'Vaste kracht', telefoon: '', knvb: '', bron: '' },
+  { kind: 'profile', ref_id: 'u1', naam: 'Charlene Ripassa', groep: 'Beheerder', telefoon: '+31622222222', knvb: '', bron: 'excel' },
+];
+
+// Zelfde kolommen als "Barvrijwilligers 2026-2027.xlsx", als CSV met puntkomma's
+const CSV = [
+  'Groep;Commissie;Functie;Roepnaam;Tv;Achternaam;Telefoon;KNVB bondsnummer;KNVB Bondsnummer kind;Jaar;Team;E-Mail;inzetbaar',
+  ';;Bar coordinator;Leonne;;Wiekstra;06-11111111;;;;;;Flexkracht',          // volledige naam
+  ';;Barvrijwilliger;Inge;;;06-22222222;;;;;;Zaterdag',                       // alleen roepnaam, app heeft "Inge"
+  ';;Barvrijwilliger;Kees;;Phielix;06-33333333;;;;;;Flexkracht',             // in app zelf ingevuld
+  ';;Jeugdpoule ;Sanne;;Wiekstra;06-44444444;;;;;;Zaterdag',                 // jeugdpoule
+  ';;Barvrijwilliger;Dolf;;Heebing;06-55555555;KNVB9;;;;;Flexkracht',        // op roepnaam
+  ';;Bar coordinator;Charlene;;Ripassa;06-22222222;;;;;;nvt',                // al gelijk
+  ';;Barvrijwilliger;Nieuwe;;Vrijwilliger;06-66666666;;;;;;zaterdag',        // niet gevonden
+  ';;Barvrijwilliger;Rick;;Schonis;06-77777777;;;;;;niet meer actief',       // overslaan
+  ';;Barvrijwilliger;Femke;;Heuvel;;;;;;;?',                                 // geen nummer
+].join('\n');
+
+async function leesIn(page) {
+  await naarTab(page, 'contact');
+  await page.locator('#importKaart input[type=file]').setInputFiles({ name: 'vrijwilligers.csv', mimeType: 'text/csv', buffer: Buffer.from(CSV) });
+  await page.locator('#importKaart').getByRole('button', { name: 'Inlezen' }).click();
+  await expect(page.locator('#content')).toContainText('Overzicht: vrijwilligers.csv');
+}
+const rij = (page, n) => page.locator(`.imprij[data-rij="${n}"]`);
+
+test('import: het overzicht koppelt, slaat over en laat twijfelgevallen uit staan', async ({ page }) => {
+  const s = stand({ rol: 'barco', contacts: IMPORT_CONTACTEN });
+  await nepDatabase(page, s);
+  await logInMetAccount(page);
+  await leesIn(page);
+
+  await expect(page.locator('#content')).toContainText('5 gekoppeld · 1 al gelijk · 1 niet gevonden · 2 overgeslagen');
+  await expect(rij(page, 2)).toHaveAttribute('data-status', 'koppel');
+  await expect(rij(page, 2).locator('input[type=checkbox]')).toBeChecked();
+  await expect(rij(page, 3).locator('input[type=checkbox]')).toBeChecked();     // Inge op roepnaam
+  await expect(rij(page, 4).locator('input[type=checkbox]')).not.toBeChecked(); // Kees: in app ingevuld
+  await expect(rij(page, 4)).toContainText('in de app ingevuld');
+  await expect(rij(page, 5).locator('input[type=checkbox]')).not.toBeChecked(); // jeugdpoule
+  await expect(rij(page, 6)).toContainText('→ Dolf (op roepnaam)');
+  await expect(rij(page, 7)).toHaveAttribute('data-status', 'gelijk');
+  await expect(rij(page, 8)).toHaveAttribute('data-status', 'geen');
+  await expect(rij(page, 9)).toContainText('niet meer actief');
+  await expect(rij(page, 10)).toContainText('geen telefoonnummer');
+  // een coördinator mag geen vaste krachten toevoegen
+  await expect(rij(page, 8).locator('input[type=checkbox]')).toHaveCount(0);
+  // er is nog niets opgeslagen
+  expect(s.rpc.filter((r) => r.fn === 'contact_import')).toHaveLength(0);
+  await expect(page.getByRole('button', { name: 'Opslaan (3)' })).toBeVisible();
+});
+
+test('import: opslaan stuurt alleen de aangevinkte regels, in +31-vorm', async ({ page }) => {
+  const s = stand({ rol: 'barco', contacts: IMPORT_CONTACTEN });
+  await nepDatabase(page, s);
+  await logInMetAccount(page);
+  await leesIn(page);
+
+  await rij(page, 5).locator('input[type=checkbox]').check();   // jeugdpoule toch meenemen
+  await rij(page, 2).locator('input[type=checkbox]').uncheck(); // Leonne niet
+  await page.getByRole('button', { name: 'Opslaan (3)' }).click();
+
+  await expect.poll(() => s.rpc.filter((r) => r.fn === 'contact_import').length).toBe(1);
+  const rows = s.rpc.find((r) => r.fn === 'contact_import').body.p_rows;
+  expect(rows).toEqual([
+    { kind: 'staff', ref_id: 'p2', telefoon: '+31622222222', knvb: '' },
+    { kind: 'staff', ref_id: 'p4', telefoon: '+31644444444', knvb: '' },
+    { kind: 'staff', ref_id: 'p5', telefoon: '+31655555555', knvb: 'KNVB9' },
+  ]);
+  // terug naar de gewone lijst, die opnieuw is opgehaald
+  await expect(page.locator('#content')).not.toContainText('Overzicht:');
+  expect(s.rpc.filter((r) => r.fn === 'contact_list').length).toBeGreaterThan(1);
+});
+
+test('import: annuleren slaat niets op', async ({ page }) => {
+  const s = stand({ rol: 'barco', contacts: IMPORT_CONTACTEN });
+  await nepDatabase(page, s);
+  await logInMetAccount(page);
+  await leesIn(page);
+  await page.getByRole('button', { name: 'Annuleren' }).click();
+  await expect(page.locator('#importKaart')).toBeVisible();
+  expect(s.rpc.filter((r) => r.fn === 'contact_import')).toHaveLength(0);
+});
+
+test('import: de beheerder kan iemand die niet gevonden is als vaste kracht toevoegen', async ({ page }) => {
+  const s = stand({ rol: 'admin', contacts: IMPORT_CONTACTEN });
+  await nepDatabase(page, s);
+  await logInMetAccount(page);
+  await leesIn(page);
+
+  for (const n of [2, 3, 6]) await rij(page, n).locator('input[type=checkbox]').uncheck();
+  await rij(page, 8).locator('input[type=checkbox]').check();
+  await page.getByRole('button', { name: 'Opslaan (1)' }).click();
+
+  await expect.poll(() => s.rpc.filter((r) => r.fn === 'contact_import').length).toBe(1);
+  expect(s.posts.filter((p) => p.tabel === 'bar_staff').map((p) => p.body)).toEqual([{ name: 'Nieuwe Vrijwilliger' }]);
+  const rows = s.rpc.find((r) => r.fn === 'contact_import').body.p_rows;
+  expect(rows).toHaveLength(1);
+  expect(rows[0]).toMatchObject({ kind: 'staff', telefoon: '+31666666666' });
+});
+
+test('import: iemand die zowel vaste kracht als coördinator is, krijgt het nummer in beide rollen', async ({ page }) => {
+  const s = stand({ rol: 'barco', contacts: [
+    { kind: 'staff', ref_id: 'p1', naam: 'Leonne Wiekstra', telefoon: '', knvb: '', bron: '' },
+    { kind: 'profile', ref_id: 'u7', naam: 'Leonne Wiekstra', telefoon: '', knvb: '', bron: '' },
+  ] });
+  await nepDatabase(page, s);
+  await logInMetAccount(page);
+  await leesIn(page);
+  await expect(rij(page, 2)).toHaveAttribute('data-status', 'koppel');
+  await page.getByRole('button', { name: /^Opslaan/ }).click();
+  await expect.poll(() => s.rpc.filter((r) => r.fn === 'contact_import').length).toBe(1);
+  expect(s.rpc.find((r) => r.fn === 'contact_import').body.p_rows.filter((r) => r.telefoon === '+31611111111'))
+    .toEqual([
+      { kind: 'staff', ref_id: 'p1', telefoon: '+31611111111', knvb: '' },
+      { kind: 'profile', ref_id: 'u7', telefoon: '+31611111111', knvb: '' },
+    ]);
+});
+
+test('import: alles aanvinken werkt per groep', async ({ page }) => {
+  const s = stand({ rol: 'barco', contacts: IMPORT_CONTACTEN });
+  await nepDatabase(page, s);
+  await logInMetAccount(page);
+  await leesIn(page);
+  const gekoppeld = page.locator('.card', { hasText: 'Gekoppeld (5)' });
+  await gekoppeld.getByRole('button', { name: 'Alles aanvinken' }).click();
+  await expect(page.getByRole('button', { name: 'Opslaan (5)' })).toBeVisible();
+  await gekoppeld.getByRole('button', { name: 'Alles uitvinken' }).click();
+  await expect(page.getByRole('button', { name: 'Niets geselecteerd' })).toBeDisabled();
 });

@@ -5,3 +5,6 @@ blob-report/
 .DS_Store
 # bevat telefoonnummers, hoort niet in de repo
 *telefoons-import.sql
+# Excel-bestanden met persoonsgegevens horen niet in de repo
+*.xlsx
+*.xls

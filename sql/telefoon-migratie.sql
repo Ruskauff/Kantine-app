@@ -163,6 +163,45 @@ begin
 end $$;
 
 
+-- ---------- 5b. Coordinator: nummers in een keer importeren ----------
+-- Voor het tabblad Contact > "Nummers bijwerken uit Excel". De app doet het
+-- koppelen en laat zien wat er gebeurt; deze functie schrijft alleen weg.
+-- p_rows: [{"kind":"staff","ref_id":"...","telefoon":"06...","knvb":"..."}, ...]
+-- Regels met een ongeldig nummer of een onbekende persoon worden overgeslagen.
+create or replace function public.contact_import(p_rows jsonb)
+returns integer
+language plpgsql security definer set search_path = public as $$
+declare
+  r     jsonb;
+  v_tel text;
+  v_n   integer := 0;
+begin
+  if not public.swap_is_coord() then
+    raise exception 'Alleen de kantinecoordinator of beheerder mag telefoonnummers importeren';
+  end if;
+  if jsonb_typeof(p_rows) <> 'array' then raise exception 'Verwacht een lijst'; end if;
+
+  for r in select * from jsonb_array_elements(p_rows) loop
+    v_tel := public.norm_telefoon(r->>'telefoon');
+    continue when v_tel is null or v_tel = '';
+    continue when not (
+         (r->>'kind' = 'team'    and exists (select 1 from public.teams t     where t.id::text = r->>'ref_id'))
+      or (r->>'kind' = 'staff'   and exists (select 1 from public.bar_staff b where b.id::text = r->>'ref_id'))
+      or (r->>'kind' = 'profile' and exists (select 1 from public.profiles p  where p.id::text = r->>'ref_id'))
+    );
+    insert into public.contacts(kind, ref_id, telefoon, knvb, bron, updated_at)
+    values (r->>'kind', r->>'ref_id', v_tel, coalesce(r->>'knvb',''), 'excel', now())
+    on conflict (kind, ref_id) do update
+      set telefoon   = excluded.telefoon,
+          knvb       = case when excluded.knvb <> '' then excluded.knvb else public.contacts.knvb end,
+          bron       = 'excel',
+          updated_at = now();
+    v_n := v_n + 1;
+  end loop;
+  return v_n;
+end $$;
+
+
 -- ---------- 6. Rechten ----------
 revoke execute on function public.team_get_phone(text)                   from public;
 revoke execute on function public.team_set_phone(text,text)              from public;
@@ -172,6 +211,8 @@ grant  execute on function public.team_get_phone(text)                   to anon
 grant  execute on function public.team_set_phone(text,text)              to anon, authenticated;
 grant  execute on function public.contact_list()                         to authenticated;
 grant  execute on function public.contact_set(text,text,text,text)       to authenticated;
+revoke execute on function public.contact_import(jsonb)                  from public;
+grant  execute on function public.contact_import(jsonb)                  to authenticated;
 
 
 -- ---------- 7. Controle ----------

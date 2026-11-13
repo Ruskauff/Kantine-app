@@ -1,0 +1,1785 @@
+[
+ {
+  "datum": "2026-11-13",
+  "start": "20:00",
+  "end": "20:30",
+  "thuis": "Arnhemse Boys Schuytgraaf 35+2",
+  "uit": "ESA 35+1",
+  "team_id": "35+2",
+  "leeftijd": 99,
+  "units": [
+   "HV-A1",
+   "HV-A2"
+  ],
+  "deel": 1,
+  "kk_thuis": 1,
+  "kk_uit": 2,
+  "nr": "69065",
+  "note": null
+ },
+ {
+  "datum": "2026-11-13",
+  "start": "20:00",
+  "end": "20:30",
+  "thuis": "Eendracht Arnhem 35+1",
+  "uit": "Arnhemia 35+1",
+  "team_id": null,
+  "leeftijd": 99,
+  "units": [
+   "HV-B1",
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 3,
+  "kk_uit": 4,
+  "nr": "68922",
+  "note": null
+ },
+ {
+  "datum": "2026-11-13",
+  "start": "20:30",
+  "end": "21:00",
+  "thuis": "Arnhemia 35+1",
+  "uit": "Arnhemse Boys Schuytgraaf 35+2",
+  "team_id": "35+2",
+  "leeftijd": 99,
+  "units": [
+   "HV-A1",
+   "HV-A2"
+  ],
+  "deel": 1,
+  "kk_thuis": 4,
+  "kk_uit": 1,
+  "nr": "68983",
+  "note": null
+ },
+ {
+  "datum": "2026-11-13",
+  "start": "20:30",
+  "end": "21:00",
+  "thuis": "Eendracht Arnhem 35+1",
+  "uit": "ESA 35+1",
+  "team_id": null,
+  "leeftijd": 99,
+  "units": [
+   "HV-B1",
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 3,
+  "kk_uit": 2,
+  "nr": "68840",
+  "note": null
+ },
+ {
+  "datum": "2026-11-13",
+  "start": "21:00",
+  "end": "21:30",
+  "thuis": "Arnhemse Boys Schuytgraaf 35+2",
+  "uit": "Eendracht Arnhem 35+1",
+  "team_id": "35+2",
+  "leeftijd": 99,
+  "units": [
+   "HV-A1",
+   "HV-A2"
+  ],
+  "deel": 1,
+  "kk_thuis": 1,
+  "kk_uit": 3,
+  "nr": "69148",
+  "note": null
+ },
+ {
+  "datum": "2026-11-13",
+  "start": "21:00",
+  "end": "21:30",
+  "thuis": "ESA 35+1",
+  "uit": "Arnhemia 35+1",
+  "team_id": null,
+  "leeftijd": 99,
+  "units": [
+   "HV-B1",
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 2,
+  "kk_uit": 4,
+  "nr": "68747",
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "08:30",
+  "end": "08:50",
+  "thuis": "Arnhemse Boys Schuytgraaf O7-1",
+  "uit": "Dierensche Boys O7-1",
+  "team_id": "O7-1",
+  "leeftijd": 7,
+  "units": [
+   "HV-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "81689",
+  "note": "Veld niet bekend op voetbal.nl; aangenomen HV-A1"
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "08:30",
+  "end": "08:50",
+  "thuis": "Eldenia O7-1",
+  "uit": "Arnhemse Boys Schuytgraaf O7-4",
+  "team_id": "O7-4",
+  "leeftijd": 7,
+  "units": [
+   "HV-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "81705",
+  "note": "Veld niet bekend op voetbal.nl; aangenomen HV-A1"
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "08:30",
+  "end": "09:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O9-2JM",
+  "uit": "SC Rheden O9-1",
+  "team_id": "O9-2",
+  "leeftijd": 9,
+  "units": [
+   "KG2-A2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 11,
+  "nr": "97957",
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "08:30",
+  "end": "09:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O9-3JM",
+  "uit": "RKHVV O9-2",
+  "team_id": "O9-3",
+  "leeftijd": 9,
+  "units": [
+   "KG2-A1"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 8,
+  "nr": "88259",
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "08:30",
+  "end": "09:30",
+  "thuis": "Arnhemse Boys O8-3JM",
+  "uit": "ESA O8-2",
+  "team_id": "O8-3",
+  "leeftijd": 8,
+  "units": [
+   "KG2-B1"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 3,
+  "nr": "88921",
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "08:30",
+  "end": "09:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O10-3",
+  "uit": "ESA O10-3",
+  "team_id": "O10-3",
+  "leeftijd": 10,
+  "units": [
+   "KG2-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 2,
+  "nr": "105036",
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "08:30",
+  "end": "09:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O10-2JM",
+  "uit": "Albatross O10-2",
+  "team_id": "O10-2",
+  "leeftijd": 10,
+  "units": [
+   "KG3-A2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 12,
+  "nr": "101963",
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "08:30",
+  "end": "09:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O11-1JM",
+  "uit": "N.E.C. (voetbalacademie) O11-2",
+  "team_id": "O11-1",
+  "leeftijd": 11,
+  "units": [
+   "HV-B1",
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 4,
+  "nr": "105425",
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "08:30",
+  "end": "09:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O11-4JM",
+  "uit": "OVC '85 O11-3JM",
+  "team_id": "O11-4",
+  "leeftijd": 11,
+  "units": [
+   "KG3-B1",
+   "KG3-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 4,
+  "nr": null,
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "08:30",
+  "end": "09:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O10-1",
+  "uit": "Eldenia O10-2",
+  "team_id": "O10-1",
+  "leeftijd": 10,
+  "units": [
+   "KG3-A1"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 2,
+  "nr": "97718",
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "08:30",
+  "end": "09:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O8-1JM",
+  "uit": "Quick 1888 O8-1",
+  "team_id": "O8-1",
+  "leeftijd": 8,
+  "units": [
+   "HV-A2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 3,
+  "nr": "110828",
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "08:50",
+  "end": "09:10",
+  "thuis": "Dierensche Boys O7-1",
+  "uit": "Eldenia O7-1",
+  "team_id": null,
+  "leeftijd": 7,
+  "units": [
+   "HV-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "81771",
+  "note": "Veld niet bekend op voetbal.nl; aangenomen HV-A1"
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "08:50",
+  "end": "09:10",
+  "thuis": "Arnhemse Boys Schuytgraaf O7-4",
+  "uit": "Arnhemse Boys Schuytgraaf O7-1",
+  "team_id": "O7-4",
+  "leeftijd": 7,
+  "units": [
+   "HV-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "81738",
+  "note": "Veld niet bekend op voetbal.nl; aangenomen HV-A1"
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "09:10",
+  "end": "09:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O7-4",
+  "uit": "Dierensche Boys O7-1",
+  "team_id": "O7-4",
+  "leeftijd": 7,
+  "units": [
+   "HV-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": null,
+  "kk_uit": 1,
+  "nr": "81762",
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "09:10",
+  "end": "09:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O7-1",
+  "uit": "Eldenia O7-1",
+  "team_id": "O7-1",
+  "leeftijd": 7,
+  "units": [
+   "HV-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": 1,
+  "kk_uit": 1,
+  "nr": "81665",
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "10:00",
+  "end": "11:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O12-1",
+  "uit": "Kesteren O12-1",
+  "team_id": "O12-1",
+  "leeftijd": 12,
+  "units": [
+   "KG2-A1",
+   "KG2-A2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 5,
+  "nr": "105784",
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "10:10",
+  "end": "11:40",
+  "thuis": "Arnhemse Boys Schuytgraaf O12-3",
+  "uit": "RKHVV O12-5JM",
+  "team_id": "O12-3",
+  "leeftijd": 12,
+  "units": [
+   "KG2-B1",
+   "KG2-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 6,
+  "nr": "86489",
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "10:10",
+  "end": "11:40",
+  "thuis": "Arnhemse Boys Schuytgraaf O12-5JM",
+  "uit": "RKSV Driel O12-3",
+  "team_id": "O12-5",
+  "leeftijd": 12,
+  "units": [
+   "KG3-A1",
+   "KG3-A2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 6,
+  "nr": "88970",
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "10:15",
+  "end": "11:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O13-1",
+  "uit": "VVO O13-1JM",
+  "team_id": "O13-1",
+  "leeftijd": 13,
+  "units": [
+   "HV-A1",
+   "HV-A2",
+   "HV-B1",
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 7,
+  "kk_uit": 8,
+  "nr": null,
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "12:00",
+  "end": "13:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O14-3",
+  "uit": "Eldenia O14-3",
+  "team_id": "O14-3",
+  "leeftijd": 14,
+  "units": [
+   "KG2-A1",
+   "KG2-A2",
+   "KG2-B1",
+   "KG2-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 3,
+  "kk_uit": 4,
+  "nr": null,
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "12:00",
+  "end": "13:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O13-3JM",
+  "uit": "SC Rheden O13-3JM",
+  "team_id": "O13-3",
+  "leeftijd": 13,
+  "units": [
+   "KG3-A1",
+   "KG3-A2",
+   "KG3-B1",
+   "KG3-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 1,
+  "kk_uit": 2,
+  "nr": null,
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "12:15",
+  "end": "14:00",
+  "thuis": "Arnhemse Boys Schuytgraaf O15-1",
+  "uit": "Berghem Sport O15-1",
+  "team_id": "O15-1",
+  "leeftijd": 15,
+  "units": [
+   "HV-A1",
+   "HV-A2",
+   "HV-B1",
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 12,
+  "kk_uit": 11,
+  "nr": null,
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "14:00",
+  "end": "15:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O15-3",
+  "uit": "SC Bemmel O15-2",
+  "team_id": "O15-3",
+  "leeftijd": 15,
+  "units": [
+   "KG3-A1",
+   "KG3-A2",
+   "KG3-B1",
+   "KG3-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 7,
+  "kk_uit": 8,
+  "nr": null,
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "14:15",
+  "end": "16:15",
+  "thuis": "Arnhemse Boys Schuytgraaf O16-1",
+  "uit": "De Treffers O16-2",
+  "team_id": "O16-1",
+  "leeftijd": 16,
+  "units": [
+   "KG2-A1",
+   "KG2-A2",
+   "KG2-B1",
+   "KG2-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 5,
+  "kk_uit": 6,
+  "nr": null,
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "15:00",
+  "end": "17:15",
+  "thuis": "Arnhemse Boys Schuytgraaf 1",
+  "uit": "Kolping-Dynamo 1",
+  "team_id": "Zat1",
+  "leeftijd": 99,
+  "units": [
+   "HV-A1",
+   "HV-A2",
+   "HV-B1",
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 1,
+  "kk_uit": 2,
+  "nr": null,
+  "note": null
+ },
+ {
+  "datum": "2026-11-14",
+  "start": "16:15",
+  "end": "18:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O19-2",
+  "uit": "RKHVV O19-2",
+  "team_id": "O19-2",
+  "leeftijd": 19,
+  "units": [
+   "KG3-A1",
+   "KG3-A2",
+   "KG3-B1",
+   "KG3-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 3,
+  "kk_uit": 4,
+  "nr": null,
+  "note": null
+ },
+ {
+  "datum": "2026-11-18",
+  "start": "18:30",
+  "end": "20:00",
+  "thuis": "Arnhemse Boys Schuytgraaf O13-2JM",
+  "uit": "OSC O13-2",
+  "team_id": "O13-2",
+  "leeftijd": 13,
+  "units": [],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "101022",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "08:30",
+  "end": "08:50",
+  "thuis": "Arnhemse Boys Schuytgraaf O7-2",
+  "uit": "Jonge Kracht O7-1JM",
+  "team_id": "O7-2",
+  "leeftijd": 7,
+  "units": [
+   "KG3-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "82010",
+  "note": "Veld niet bekend op voetbal.nl; aangenomen KG3-A1"
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "08:30",
+  "end": "08:50",
+  "thuis": "Arnhemse Boys Schuytgraaf O7-5JM",
+  "uit": "Arnhemse Boys Schuytgraaf O7-2",
+  "team_id": "O7-5",
+  "leeftijd": 7,
+  "units": [
+   "KG3-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "81961",
+  "note": "Veld niet bekend op voetbal.nl; aangenomen KG3-A1"
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "08:30",
+  "end": "09:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O8-5",
+  "uit": "SJO Rijnland - Gelders Eiland O8-2JM",
+  "team_id": "O8-5",
+  "leeftijd": 8,
+  "units": [
+   "KG3-B1"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 5,
+  "nr": "99190",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "08:30",
+  "end": "09:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O10-4",
+  "uit": "Jonge Kracht O10-2JM",
+  "team_id": "O10-4",
+  "leeftijd": 10,
+  "units": [
+   "KG2-B1"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 2,
+  "nr": "83133",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "08:30",
+  "end": "09:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O11-2",
+  "uit": "MASV O11-1",
+  "team_id": "O11-2",
+  "leeftijd": 11,
+  "units": [
+   "HV-B1",
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 11,
+  "nr": "87099",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "08:30",
+  "end": "09:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O11-3",
+  "uit": "VDZ O11-4",
+  "team_id": "O11-3",
+  "leeftijd": 11,
+  "units": [
+   "HV-A1",
+   "HV-A2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 12,
+  "nr": "96458",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "08:30",
+  "end": "09:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O9-1JM",
+  "uit": "Elsweide O9-1",
+  "team_id": "O9-1",
+  "leeftijd": 9,
+  "units": [
+   "KG2-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 6,
+  "nr": "98978",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "08:30",
+  "end": "09:30",
+  "thuis": "Arnhemse Boys O9-5JM",
+  "uit": "DVOV O9-3JM",
+  "team_id": "O9-5",
+  "leeftijd": 9,
+  "units": [
+   "KG2-A1"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 6,
+  "nr": "106414",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "08:30",
+  "end": "09:30",
+  "thuis": "Arnhemse Boys O9-4JM",
+  "uit": "SVHA O9-1",
+  "team_id": "O9-4",
+  "leeftijd": 9,
+  "units": [
+   "KG3-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 8,
+  "nr": "97048",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "08:30",
+  "end": "09:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O10-5",
+  "uit": "ESA O10-4",
+  "team_id": "O10-5",
+  "leeftijd": 10,
+  "units": [
+   "KG2-A2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 2,
+  "nr": "97254",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "08:50",
+  "end": "09:10",
+  "thuis": "Arnhemse Boys Schuytgraaf O7-5JM",
+  "uit": "Jonge Kracht O7-2JM",
+  "team_id": "O7-5",
+  "leeftijd": 7,
+  "units": [
+   "KG3-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "81986",
+  "note": "Veld niet bekend op voetbal.nl; aangenomen KG3-A1"
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "08:50",
+  "end": "09:10",
+  "thuis": "Jonge Kracht O7-2JM",
+  "uit": "Arnhemse Boys Schuytgraaf O7-2",
+  "team_id": "O7-2",
+  "leeftijd": 7,
+  "units": [
+   "KG3-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "82073",
+  "note": "Veld niet bekend op voetbal.nl; aangenomen KG3-A1"
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "09:10",
+  "end": "09:30",
+  "thuis": "Jonge Kracht O7-1JM",
+  "uit": "Arnhemse Boys Schuytgraaf O7-5JM",
+  "team_id": "O7-5",
+  "leeftijd": 7,
+  "units": [
+   "KG3-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "82018",
+  "note": "Veld niet bekend op voetbal.nl; aangenomen KG3-A1"
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "09:10",
+  "end": "09:30",
+  "thuis": "Jonge Kracht O7-1JM",
+  "uit": "Jonge Kracht O7-2JM",
+  "team_id": null,
+  "leeftijd": 7,
+  "units": [
+   "KG3-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": 1,
+  "kk_uit": 1,
+  "nr": "82043",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "10:00",
+  "end": "11:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O13-3JM",
+  "uit": "VDZ O13-5",
+  "team_id": "O13-3",
+  "leeftijd": 13,
+  "units": [
+   "KG3-A1",
+   "KG3-A2",
+   "KG3-B1",
+   "KG3-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 3,
+  "kk_uit": 4,
+  "nr": "94460",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "10:05",
+  "end": "11:35",
+  "thuis": "Arnhemse Boys Schuytgraaf O12-4JM",
+  "uit": "OSC O12-4",
+  "team_id": "O12-4",
+  "leeftijd": 12,
+  "units": [
+   "KG2-A1",
+   "KG2-A2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 7,
+  "nr": "85539",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "10:10",
+  "end": "11:40",
+  "thuis": "Arnhemse Boys Schuytgraaf O12-5JM",
+  "uit": "SML O12-3",
+  "team_id": "O12-5",
+  "leeftijd": 12,
+  "units": [
+   "HV-A1",
+   "HV-A2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 8,
+  "nr": "100538",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "10:10",
+  "end": "11:40",
+  "thuis": "Arnhemse Boys Schuytgraaf O12-2",
+  "uit": "DVOL O12-2",
+  "team_id": "O12-2",
+  "leeftijd": 12,
+  "units": [
+   "HV-B1",
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 8,
+  "nr": "109619",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "10:30",
+  "end": "11:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O8-1JM",
+  "uit": "Woezik O8-1",
+  "team_id": "O8-1",
+  "leeftijd": 8,
+  "units": [
+   "KG2-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 5,
+  "nr": "100117",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "12:00",
+  "end": "13:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O13-2JM",
+  "uit": "De Bataven O13-1",
+  "team_id": "O13-2",
+  "leeftijd": 13,
+  "units": [
+   "KG3-A1",
+   "KG3-A2",
+   "KG3-B1",
+   "KG3-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 1,
+  "kk_uit": 2,
+  "nr": "100361",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "12:10",
+  "end": "13:55",
+  "thuis": "Arnhemse Boys Schuytgraaf O14-2",
+  "uit": "Dodewaard O14-1JM",
+  "team_id": "O14-2",
+  "leeftijd": 14,
+  "units": [
+   "KG2-A1",
+   "KG2-A2",
+   "KG2-B1",
+   "KG2-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 11,
+  "kk_uit": 12,
+  "nr": "108677",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "12:15",
+  "end": "14:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O19-1",
+  "uit": "Woezik O19-1",
+  "team_id": "O19-1",
+  "leeftijd": 19,
+  "units": [
+   "HV-A1",
+   "HV-A2",
+   "HV-B1",
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 5,
+  "kk_uit": 6,
+  "nr": null,
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "14:00",
+  "end": "15:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O15-2",
+  "uit": "Spero O15-2",
+  "team_id": "O15-2",
+  "leeftijd": 15,
+  "units": [
+   "KG3-A1",
+   "KG3-A2",
+   "KG3-B1",
+   "KG3-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 3,
+  "kk_uit": 4,
+  "nr": "95247",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "14:15",
+  "end": "16:15",
+  "thuis": "Arnhemse Boys Schuytgraaf O16-2",
+  "uit": "ESA O16-2",
+  "team_id": "O16-2",
+  "leeftijd": 16,
+  "units": [
+   "KG2-A1",
+   "KG2-A2",
+   "KG2-B1",
+   "KG2-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 7,
+  "kk_uit": 8,
+  "nr": "107584",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "15:00",
+  "end": "17:15",
+  "thuis": "Arnhemse Boys Schuytgraaf 1",
+  "uit": "Eendracht '30 1",
+  "team_id": "Zat1",
+  "leeftijd": 99,
+  "units": [
+   "HV-A1",
+   "HV-A2",
+   "HV-B1",
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 1,
+  "kk_uit": 2,
+  "nr": null,
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "16:00",
+  "end": "18:00",
+  "thuis": "Arnhemse Boys Schuytgraaf O16-3",
+  "uit": "Unitas '28 O16-1",
+  "team_id": "O16-3",
+  "leeftijd": 16,
+  "units": [
+   "KG3-A1",
+   "KG3-A2",
+   "KG3-B1",
+   "KG3-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 11,
+  "kk_uit": 12,
+  "nr": "92800",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "16:20",
+  "end": "18:20",
+  "thuis": "Arnhemse Boys Schuytgraaf O17-2",
+  "uit": "Jonge Kracht O17-2",
+  "team_id": "O17-2",
+  "leeftijd": 17,
+  "units": [
+   "KG2-A1",
+   "KG2-A2",
+   "KG2-B1",
+   "KG2-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 5,
+  "kk_uit": 6,
+  "nr": "96121",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "17:30",
+  "end": "19:45",
+  "thuis": "Arnhemse Boys Schuytgraaf 2",
+  "uit": "DVC '26 2 zat",
+  "team_id": "Zat2",
+  "leeftijd": 99,
+  "units": [
+   "HV-A1",
+   "HV-A2",
+   "HV-B1",
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 3,
+  "kk_uit": 4,
+  "nr": "20964",
+  "note": null
+ },
+ {
+  "datum": "2026-11-21",
+  "start": "18:15",
+  "end": "20:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O19-3",
+  "uit": "Excelsior Z. O19-3",
+  "team_id": "O19-3",
+  "leeftijd": 19,
+  "units": [
+   "KG3-A1",
+   "KG3-A2",
+   "KG3-B1",
+   "KG3-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 7,
+  "kk_uit": 8,
+  "nr": "93633",
+  "note": null
+ },
+ {
+  "datum": "2026-11-27",
+  "start": "20:00",
+  "end": "20:30",
+  "thuis": "ESA 35+4",
+  "uit": "Arnhemse Boys Schuytgraaf 35+1",
+  "team_id": "35+1",
+  "leeftijd": 99,
+  "units": [],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "75584",
+  "note": null
+ },
+ {
+  "datum": "2026-11-27",
+  "start": "20:00",
+  "end": "20:30",
+  "thuis": "Eldenia 35+4",
+  "uit": "Eldenia 35+5",
+  "team_id": null,
+  "leeftijd": 99,
+  "units": [],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "74526",
+  "note": null
+ },
+ {
+  "datum": "2026-11-27",
+  "start": "20:30",
+  "end": "21:00",
+  "thuis": "Eldenia 35+4",
+  "uit": "ESA 35+4",
+  "team_id": null,
+  "leeftijd": 99,
+  "units": [],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "74790",
+  "note": null
+ },
+ {
+  "datum": "2026-11-27",
+  "start": "20:30",
+  "end": "21:00",
+  "thuis": "Arnhemse Boys Schuytgraaf 35+1",
+  "uit": "Jonge Kracht 35+3",
+  "team_id": "35+1",
+  "leeftijd": 99,
+  "units": [],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "75676",
+  "note": null
+ },
+ {
+  "datum": "2026-11-27",
+  "start": "21:00",
+  "end": "21:30",
+  "thuis": "Jonge Kracht 35+3",
+  "uit": "ESA 35+4",
+  "team_id": null,
+  "leeftijd": 99,
+  "units": [],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "75316",
+  "note": null
+ },
+ {
+  "datum": "2026-11-27",
+  "start": "21:00",
+  "end": "21:30",
+  "thuis": "Eldenia 35+5",
+  "uit": "Arnhemse Boys Schuytgraaf 35+1",
+  "team_id": "35+1",
+  "leeftijd": 99,
+  "units": [],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "75211",
+  "note": null
+ },
+ {
+  "datum": "2026-11-27",
+  "start": "21:30",
+  "end": "22:00",
+  "thuis": "Eldenia 35+4",
+  "uit": "Arnhemse Boys Schuytgraaf 35+1",
+  "team_id": "35+1",
+  "leeftijd": 99,
+  "units": [],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "74921",
+  "note": null
+ },
+ {
+  "datum": "2026-11-27",
+  "start": "21:30",
+  "end": "22:00",
+  "thuis": "Eldenia 35+5",
+  "uit": "Jonge Kracht 35+3",
+  "team_id": null,
+  "leeftijd": 99,
+  "units": [],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "75079",
+  "note": null
+ },
+ {
+  "datum": "2026-11-27",
+  "start": "22:00",
+  "end": "22:30",
+  "thuis": "ESA 35+4",
+  "uit": "Eldenia 35+5",
+  "team_id": null,
+  "leeftijd": 99,
+  "units": [],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "75453",
+  "note": null
+ },
+ {
+  "datum": "2026-11-27",
+  "start": "22:00",
+  "end": "22:30",
+  "thuis": "Eldenia 35+4",
+  "uit": "Jonge Kracht 35+3",
+  "team_id": null,
+  "leeftijd": 99,
+  "units": [],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "74658",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "08:30",
+  "end": "08:50",
+  "thuis": "v.v. Dieren O7-2",
+  "uit": "Eldenia O7-2JM",
+  "team_id": null,
+  "leeftijd": 7,
+  "units": [
+   "HV-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "82285",
+  "note": "Veld niet bekend op voetbal.nl; aangenomen HV-A1"
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "08:30",
+  "end": "08:50",
+  "thuis": "Excelsior Z. O7-3",
+  "uit": "Arnhemse Boys Schuytgraaf O7-3",
+  "team_id": "O7-3",
+  "leeftijd": 7,
+  "units": [
+   "HV-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "82274",
+  "note": "Veld niet bekend op voetbal.nl; aangenomen HV-A1"
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "08:30",
+  "end": "09:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O8-2JM",
+  "uit": "OSC O8-6",
+  "team_id": "O8-2",
+  "leeftijd": 8,
+  "units": [
+   "HV-B1"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 5,
+  "nr": "96337",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "08:30",
+  "end": "09:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O9-3JM",
+  "uit": "Arnhemia O9-1",
+  "team_id": "O9-3",
+  "leeftijd": 9,
+  "units": [
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 2,
+  "nr": "104506",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "08:30",
+  "end": "09:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O9-2JM",
+  "uit": "ESA O9-2",
+  "team_id": "O9-2",
+  "leeftijd": 9,
+  "units": [
+   "KG3-A1"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 2,
+  "nr": "93639",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "08:30",
+  "end": "09:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O8-4",
+  "uit": "SVHA O8-2",
+  "team_id": "O8-4",
+  "leeftijd": 8,
+  "units": [
+   "HV-A2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 5,
+  "nr": "92488",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "08:30",
+  "end": "09:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O11-4JM",
+  "uit": "VVO O11-4",
+  "team_id": "O11-4",
+  "leeftijd": 11,
+  "units": [
+   "KG2-B1",
+   "KG2-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 7,
+  "nr": "94246",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "08:30",
+  "end": "09:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O10-3",
+  "uit": "RKHVV O10-2",
+  "team_id": "O10-3",
+  "leeftijd": 10,
+  "units": [
+   "KG3-B1"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 8,
+  "nr": "104880",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "08:30",
+  "end": "09:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O10-2JM",
+  "uit": "DVOV O10-1",
+  "team_id": "O10-2",
+  "leeftijd": 10,
+  "units": [
+   "KG3-A2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 6,
+  "nr": "102316",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "08:30",
+  "end": "09:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O10-1",
+  "uit": "MASV O10-1JM",
+  "team_id": "O10-1",
+  "leeftijd": 10,
+  "units": [
+   "KG3-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 8,
+  "nr": "95584",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "08:30",
+  "end": "09:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O11-1JM",
+  "uit": "De Treffers O11-2",
+  "team_id": "O11-1",
+  "leeftijd": 11,
+  "units": [
+   "KG2-A1",
+   "KG2-A2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 7,
+  "nr": "97277",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "08:50",
+  "end": "09:10",
+  "thuis": "Eldenia O7-2JM",
+  "uit": "Excelsior Z. O7-3",
+  "team_id": null,
+  "leeftijd": 7,
+  "units": [
+   "HV-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "82314",
+  "note": "Veld niet bekend op voetbal.nl; aangenomen HV-A1"
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "08:50",
+  "end": "09:10",
+  "thuis": "Arnhemse Boys Schuytgraaf O7-3",
+  "uit": "v.v. Dieren O7-2",
+  "team_id": "O7-3",
+  "leeftijd": 7,
+  "units": [
+   "HV-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": null,
+  "kk_uit": 1,
+  "nr": "82368",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "09:10",
+  "end": "09:30",
+  "thuis": "Eldenia O7-2JM",
+  "uit": "Arnhemse Boys Schuytgraaf O7-3",
+  "team_id": "O7-3",
+  "leeftijd": 7,
+  "units": [
+   "HV-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": 1,
+  "kk_uit": null,
+  "nr": "82339",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "09:10",
+  "end": "09:30",
+  "thuis": "Excelsior Z. O7-3",
+  "uit": "v.v. Dieren O7-2",
+  "team_id": null,
+  "leeftijd": 7,
+  "units": [
+   "HV-A1"
+  ],
+  "deel": 0.5,
+  "kk_thuis": null,
+  "kk_uit": 1,
+  "nr": "82249",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "10:00",
+  "end": "11:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O12-1",
+  "uit": "Orion O12-2",
+  "team_id": "O12-1",
+  "leeftijd": 12,
+  "units": [
+   "HV-A1",
+   "HV-A2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 12,
+  "nr": "108909",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "10:00",
+  "end": "11:30",
+  "thuis": "Arnhemse Boys Schuytgraaf O12-3",
+  "uit": "DCS O12-2JM",
+  "team_id": "O12-3",
+  "leeftijd": 12,
+  "units": [
+   "HV-B1",
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": 11,
+  "nr": "95636",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "10:15",
+  "end": "12:00",
+  "thuis": "Arnhemse Boys Schuytgraaf O14-3",
+  "uit": "DVC '26 O14-1",
+  "team_id": "O14-3",
+  "leeftijd": 14,
+  "units": [
+   "KG3-A1",
+   "KG3-A2",
+   "KG3-B1",
+   "KG3-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 3,
+  "kk_uit": 4,
+  "nr": "86370",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "10:25",
+  "end": "11:55",
+  "thuis": "Arnhemse Boys Schuytgraaf O13-1",
+  "uit": "Eldenia O13-1JM",
+  "team_id": "O13-1",
+  "leeftijd": 13,
+  "units": [
+   "KG2-A1",
+   "KG2-A2",
+   "KG2-B1",
+   "KG2-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 5,
+  "kk_uit": 6,
+  "nr": "98923",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "12:00",
+  "end": "13:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O15-1",
+  "uit": "FC Dordrecht O15-1",
+  "team_id": "O15-1",
+  "leeftijd": 15,
+  "units": [
+   "HV-A1",
+   "HV-A2",
+   "HV-B1",
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 7,
+  "kk_uit": 8,
+  "nr": "49396",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "12:30",
+  "end": "14:15",
+  "thuis": "Arnhemse Boys Schuytgraaf O14-1JM",
+  "uit": "sv O.S.S. 1920 O14-1",
+  "team_id": "O14-1",
+  "leeftijd": 14,
+  "units": [
+   "KG2-A1",
+   "KG2-A2",
+   "KG2-B1",
+   "KG2-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 11,
+  "kk_uit": 12,
+  "nr": "24879",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "12:30",
+  "end": "14:15",
+  "thuis": "Arnhemse Boys Schuytgraaf O15-3",
+  "uit": "De Bataven O15-2",
+  "team_id": "O15-3",
+  "leeftijd": 15,
+  "units": [
+   "KG3-A1",
+   "KG3-A2",
+   "KG3-B1",
+   "KG3-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 1,
+  "kk_uit": 2,
+  "nr": "86232",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "14:30",
+  "end": "16:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O19-1",
+  "uit": "DIO '30 O19-1",
+  "team_id": "O19-1",
+  "leeftijd": 19,
+  "units": [
+   "HV-A1",
+   "HV-A2",
+   "HV-B1",
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 3,
+  "kk_uit": 4,
+  "nr": "83601",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "14:45",
+  "end": "16:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O17-1",
+  "uit": "AWC O17-1",
+  "team_id": "O17-1",
+  "leeftijd": 17,
+  "units": [
+   "KG3-A1",
+   "KG3-A2",
+   "KG3-B1",
+   "KG3-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 5,
+  "kk_uit": 6,
+  "nr": "39588",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "14:45",
+  "end": "16:45",
+  "thuis": "Arnhemse Boys Schuytgraaf O16-1",
+  "uit": "SC Bemmel O16-1",
+  "team_id": "O16-1",
+  "leeftijd": 16,
+  "units": [
+   "KG2-A1",
+   "KG2-A2",
+   "KG2-B1",
+   "KG2-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 7,
+  "kk_uit": 8,
+  "nr": "89828",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "17:00",
+  "end": "19:15",
+  "thuis": "Arnhemse Boys Schuytgraaf O19-3",
+  "uit": "VDZ O19-5",
+  "team_id": "O19-3",
+  "leeftijd": 19,
+  "units": [
+   "HV-A1",
+   "HV-A2",
+   "HV-B1",
+   "HV-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 1,
+  "kk_uit": 2,
+  "nr": "98848",
+  "note": null
+ },
+ {
+  "datum": "2026-11-28",
+  "start": "17:00",
+  "end": "19:00",
+  "thuis": "Arnhemse Boys Schuytgraaf O17-2",
+  "uit": "Blauw Wit O17-1",
+  "team_id": "O17-2",
+  "leeftijd": 17,
+  "units": [
+   "KG2-A1",
+   "KG2-A2",
+   "KG2-B1",
+   "KG2-B2"
+  ],
+  "deel": 1,
+  "kk_thuis": 11,
+  "kk_uit": 12,
+  "nr": "105524",
+  "note": null
+ },
+ {
+  "datum": "2026-11-29",
+  "start": "12:00",
+  "end": "14:15",
+  "thuis": "Arnhemse Boys Schuytgraaf 2",
+  "uit": "De Bataven 9",
+  "team_id": "Zon2",
+  "leeftijd": 99,
+  "units": [],
+  "deel": 1,
+  "kk_thuis": null,
+  "kk_uit": null,
+  "nr": "11868",
+  "note": null
+ }
+]

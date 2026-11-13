@@ -202,6 +202,18 @@
   /* het actieve tabblad kreeg een rode achtergrond uit de login-tabs met rode tekst erop: onleesbaar */
   nav.tabs button.on{background:transparent;color:var(--accent)}
   nav.tabs button.on .navcount{background:var(--accent);color:#fff}
+  /* telefoonnummers: knoppen om te appen of te sms'en */
+  .telacts{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  a.telbtn{display:inline-flex;align-items:center;gap:4px;text-decoration:none;font-weight:700;font-size:13px;
+    padding:6px 10px;border-radius:8px;border:1px solid var(--line);color:var(--text);background:var(--panel)}
+  a.telbtn.wa{background:#e9f8ef;border-color:#9fd8b4;color:#14653a}
+  a.telbtn.uit{opacity:.4;pointer-events:none}
+  .contactrij{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;
+    border:1px solid var(--line);border-radius:11px;padding:8px 10px;margin:8px 0;font-size:13px}
+  .telin{width:150px;flex:0 1 150px}
+  .telin.fout{border-color:var(--accent)}
+  .geennr{color:var(--warntext);font-size:12px}
+  .contacttype{font-size:11.5px;color:var(--muted)}
 </style>
 
 <div id="login">
@@ -250,6 +262,7 @@
   <button data-tab="mijn" data-roles="vast"><span class="ico">✅</span>Mijn diensten</button>
   <button data-tab="overzicht" data-roles="admin barco vast"><span class="ico">📋</span>Overzicht</button>
   <button data-tab="ruil" data-roles="admin barco"><span class="ico">🔁</span><span class="navlbl">Ruilen</span></button>
+  <button data-tab="contact" data-roles="admin barco"><span class="ico">📱</span>Contact</button>
   <button data-tab="beheer" data-roles="admin"><span class="ico">⚙️</span>Beheer</button>
 </nav>
 
@@ -306,6 +319,43 @@ $('#infoClose').onclick=()=>$('#infoModal').classList.add('hide');
 $('#infoModal').onclick=e=>{if(e.target.id==='infoModal')$('#infoModal').classList.add('hide');};
 $('#infoBtn').onclick=()=>showInfo('Kantine-info',(config&&config.general_info)||'');
 function infoBadge(task){const t=((config&&config.task_info)||{})[task];if(!t)return null;const b=el('span','infoi');b.textContent='ℹ️';b.title='Uitleg bij '+task;b.onclick=e=>{e.stopPropagation();showInfo(task,t);};return b;}
+
+/* ---------- Telefoonnummers ----------
+   Zelfde regels als public.norm_telefoon in sql/telefoon-migratie.sql:
+   '' bij lege invoer, null bij een ongeldig nummer, anders +31... */
+function normTel(p){
+  const s=String(p==null?'':p).trim();if(!s)return '';
+  let d=s.replace(/[^0-9]/g,'');
+  if(s[0]==='+')d='+'+d;
+  else if(d.startsWith('00'))d='+'+d.slice(2);
+  else if(d[0]==='0')d='+31'+d.slice(1);
+  else if(d.length===9&&d[0]==='6')d='+31'+d;
+  else return null;
+  if(d.startsWith('+31'))return d.length===12?d:null;
+  return (d.length>=9&&d.length<=16)?d:null;
+}
+/* +31612345678 -> 06 1234 5678; andere nummers ongewijzigd */
+function fmtTel(t){if(!t)return '';if(/^\+316\d{8}$/.test(t))return '06 '+t.slice(4,8)+' '+t.slice(8);if(/^\+31\d{9}$/.test(t))return '0'+t.slice(3);return t;}
+function waLink(tel,tekst){return 'https://wa.me/'+String(tel).replace(/^\+/,'')+(tekst?'?text='+encodeURIComponent(tekst):'');}
+/* "?&body=" werkt op zowel iPhone als Android */
+function smsLink(tel,tekst){return 'sms:'+tel+(tekst?'?&body='+encodeURIComponent(tekst):'');}
+function telKnoppen(tel,tekst){
+  const w=el('span','telacts');
+  const mk=(cls,txt,href,title)=>{const a=el('a','telbtn '+cls+(tel?'':' uit'));a.textContent=txt;a.title=title;
+    if(tel){a.href=href;if(cls==='wa'){a.target='_blank';a.rel='noopener';}}
+    w.appendChild(a);};
+  mk('wa','WhatsApp',tel?waLink(tel,tekst):'','Open WhatsApp met dit bericht');
+  mk('sms','Sms',tel?smsLink(tel,tekst):'','Open een sms met dit bericht');
+  return w;
+}
+/* Standaardberichten — de definitieve teksten volgen nog. */
+const APP_URL=location.origin;
+function berichtOpenDienst(s,team){
+  const open=dayBlocks(s).filter(b=>!blokTelling(s,b).rond).map(b=>b.label+' ('+b.start+'–'+b.end+')');
+  return 'Hoi, voor '+fmtDay(s.date)+' staan bij '+team+' nog plekken open in de kantine: '
+    +(open.length?open.join(', '):'—')+'. Wil je ze invullen in de app? '+APP_URL;
+}
+function berichtAlgemeen(naam){return 'Hoi '+(naam||'')+', ';}
 
 /* ---------- Sessie / login ---------- */
 let session=null; // {kind:'team',code,teamId,teamName} of {kind:'account',at,rt,exp,uid,role,name}
@@ -427,12 +477,14 @@ async function renderTeamView(){
   wrap.innerHTML='';
   if(!teamSats.length){
     wrap.innerHTML='<div class="empty">Nog geen zaterdagen ingepland voor jouw team.</div>';
+    wrap.appendChild(teamTelKaart());
     wrap.appendChild(swapSection());
     return;
   }
   const info=el('div','card');
   info.innerHTML=`<b>${escapeHtml(session.teamName)}</b> — vink per blok af wie de dienst invult. Wijzigingen worden meteen bewaard.`;
   wrap.appendChild(info);
+  wrap.appendChild(teamTelKaart());
   const vandaag=todayISO();
   const eerste=teamSats.find(x=>x.date>=vandaag);
   teamSats.forEach(s=>wrap.appendChild(satCard(s,!!eerste&&s.id===eerste.id)));
@@ -493,6 +545,44 @@ function satCard(s,eerstvolgend){
     });
     c.appendChild(b);
   });
+  return c;
+}
+
+/* Teamleider: eigen 06-nummer, zodat de barcoördinator kan appen of sms'en.
+   Bestaat de serverfunctie nog niet (migratie niet gedraaid), dan verdwijnt
+   de kaart stilletjes en werkt de rest gewoon. */
+function teamTelKaart(){
+  const c=el('div','card teltel');c.id='teamTel';
+  c.innerHTML='<div class="muted" style="font-size:12.5px">Laden…</div>';
+  (async()=>{
+    let tel='';
+    try{tel=await rpc('team_get_phone',{p_code:session.code});}catch(e){c.remove();return;}
+    if(typeof tel!=='string')tel='';
+    tekenTel(tel,!tel);
+  })();
+  function tekenTel(tel,bewerken){
+    c.innerHTML='';
+    const kop=el('div');kop.style.cssText='font-weight:600;margin-bottom:4px';kop.textContent='📱 Je telefoonnummer';c.appendChild(kop);
+    if(!bewerken){
+      const r=el('div','row');
+      r.appendChild(Object.assign(el('span'),{textContent:fmtTel(tel)}));
+      const w=el('button','btn ghost sm');w.textContent='Wijzigen';w.onclick=()=>tekenTel(tel,true);
+      r.appendChild(w);c.appendChild(r);return;
+    }
+    c.appendChild(Object.assign(el('p','muted'),{textContent:'Zodat de barcoördinator je kan appen of sms\'en over de kantinediensten van je team. Alleen de coördinator en de beheerder zien dit nummer.',style:'margin:0 0 8px;font-size:12.5px'}));
+    const r=el('div','row');
+    const inp=el('input','telin');inp.type='tel';inp.inputMode='tel';inp.autocomplete='tel';inp.placeholder='06 1234 5678';inp.value=fmtTel(tel);
+    const b=el('button','btn sm');b.textContent='Opslaan';
+    const bewaar=async()=>{
+      const n=normTel(inp.value);
+      if(n===null||n===''){inp.classList.add('fout');saved('Dit telefoonnummer klopt niet',true);return;}
+      inp.classList.remove('fout');b.disabled=true;
+      try{const t=await rpc('team_set_phone',{p_code:session.code,p_phone:n});saved();tekenTel(t||n,false);}
+      catch(e){b.disabled=false;saved('Niet opgeslagen: '+e.message,true);}
+    };
+    b.onclick=bewaar;inp.addEventListener('keydown',e=>{if(e.key==='Enter')bewaar();});
+    r.appendChild(inp);r.appendChild(b);c.appendChild(r);
+  }
   return c;
 }
 
@@ -792,6 +882,15 @@ function accSatCard(s){
     const del=el('button','btn sm dng');del.textContent='✕';del.title='Zaterdag verwijderen';del.onclick=async()=>{if(!confirm('Deze zaterdag verwijderen?'))return;try{await sbSend('DELETE','saturdays?id=eq.'+s.id);data.saturdays=data.saturdays.filter(x=>x!==s);saved();renderAccTab();}catch(e){saved('Fout',true);}};
     arow.appendChild(sel);arow.appendChild(del);body.appendChild(arow);
   }
+  // ---- teamleider appen of sms'en als er nog plekken open staan ----
+  if((role==='admin'||role==='barco')&&s.team&&komend(s)&&!dagTelling(s).rond){
+    const tel=teamTel(s.team);
+    const cr=el('div','contactrij');
+    const l=el('div');l.appendChild(Object.assign(el('span'),{textContent:'Teamleider '+teamName(s.team)}));
+    if(!tel)l.appendChild(Object.assign(el('div','geennr'),{textContent:'nog geen telefoonnummer — vul het in via Contact'}));
+    cr.appendChild(l);cr.appendChild(telKnoppen(tel,berichtOpenDienst(s,teamName(s.team))));
+    body.appendChild(cr);
+  }
   let done=0,total=0;dayBlocks(s).forEach(b=>{const a=blockArr(s.team_status,b);total+=a.length;done+=a.filter(x=>x.done).length;});
   const pr=el('div','progress');const bar=el('i');bar.style.width=(total?Math.round(done/total*100):0)+'%';pr.appendChild(bar);body.appendChild(pr);
   const lbl=el('div','prlabel');lbl.textContent=(total&&done===total)?'✔ Team volledig ingevuld':`${done}/${total} taken`;body.appendChild(lbl);
@@ -936,7 +1035,18 @@ async function loadData(){
     codes.forEach(c=>data.codes[c.team_id]=c.code);
     data.profiles=profs;
   }
+  await laadContacten();
 }
+/* Telefoonnummers: alleen voor coördinator en beheerder. Lukt het niet
+   (bijvoorbeeld omdat de migratie nog niet gedraaid is), dan blijft de rest
+   van de app gewoon werken en meldt het tabblad Contact wat er mis is. */
+async function laadContacten(){
+  data.contacts=[];data.contactFout=null;
+  if(session.role!=='admin'&&session.role!=='barco')return;
+  try{data.contacts=(await authRpc('contact_list',{}))||[];}
+  catch(e){data.contactFout=e.message;}
+}
+const teamTel=id=>{const c=((data&&data.contacts)||[]).find(x=>x.kind==='team'&&x.ref_id===String(id));return c?c.telefoon:'';};
 /* ---------- Bar-mutatie-helpers (gedeeld) ---------- */
 async function addBar(s,sh,staffId){await sbSend('POST','bar_assignments',{saturday_id:s.id,shift_id:sh.id,staff_id:staffId});(s.bar[sh.id]=s.bar[sh.id]||[]).push(staffId);}
 async function delBar(s,sh,staffId){await sbSend('DELETE',`bar_assignments?saturday_id=eq.${s.id}&shift_id=eq.${sh.id}&staff_id=eq.${staffId}`);s.bar[sh.id]=(s.bar[sh.id]||[]).filter(y=>y!==staffId);}
@@ -991,6 +1101,7 @@ async function renderAccountApp(){
 function renderAccTab(){
   if(accTab==='mijn')renderMijnTab();
   else if(accTab==='ruil')renderRuilTab();
+  else if(accTab==='contact')renderContactTab();
   else if(accTab==='overzicht')renderOverzichtTab();
   else if(accTab==='beheer')renderBeheerTab();
   else renderRoosterTab();
@@ -1346,6 +1457,84 @@ function renderRoosterTab(){
      style:'font-size:12.5px;margin:2px 0 10px'}));
   if(!list.length){wrap.appendChild(Object.assign(el('div','empty'),{textContent:'Geen zaterdagen die aan het filter voldoen.'}));return;}
   list.forEach(s=>wrap.appendChild(accSatCard(s)));
+}
+/* ---------- Contact: teamleiders, vaste krachten en coördinatoren ---------- */
+const CSOORT={team:'Teamleiders',staff:'Vaste krachten',profile:'Coördinatoren'};
+let cf={soort:'',groep:'',zoek:'',zonder:false};
+function renderContactTab(){
+  const wrap=$('#content');wrap.innerHTML='';
+  wrap.appendChild(Object.assign(el('h2','tabttl'),{textContent:'Contact'}));
+  wrap.appendChild(Object.assign(el('p','muted'),{textContent:'App of sms teamleiders, vaste krachten en coördinatoren. Het bericht opent op je eigen telefoon; je verstuurt het zelf.',style:'margin:0 0 8px'}));
+  if(data.contactFout){
+    const c=el('div','card');
+    c.appendChild(Object.assign(el('p'),{textContent:'De telefoonnummers konden niet geladen worden ('+data.contactFout+'). Is sql/telefoon-migratie.sql al uitgevoerd in Supabase?',style:'margin:0 0 8px'}));
+    const b=el('button','btn sm');b.textContent='Opnieuw proberen';
+    b.onclick=async()=>{b.disabled=true;await laadContacten();renderContactTab();};
+    c.appendChild(b);wrap.appendChild(c);return;
+  }
+  // ---- filters (blijven staan tijdens het typen) ----
+  const fb=el('div','filterbar');
+  const mkSel=(label,opts,key)=>{const w=el('label','fitem');w.appendChild(Object.assign(el('span'),{textContent:label}));
+    const s=el('select','selin');opts.forEach(([v,tx])=>{const o=el('option');o.value=v;o.textContent=tx;s.appendChild(o);});
+    s.value=cf[key];s.onchange=()=>{cf[key]=s.value;if(key==='soort'&&s.value!=='team')cf.groep='';renderContactTab();};w.appendChild(s);fb.appendChild(w);};
+  mkSel('Soort',[['','Iedereen'],...Object.entries(CSOORT)],'soort');
+  if(cf.soort===''||cf.soort==='team')mkSel('Groep',[['','Alle groepen'],...lichtingList().map(g=>[g,g])],'groep');
+  const zw=el('label','fitem');zw.appendChild(Object.assign(el('span'),{textContent:'Zoek'}));
+  const zi=el('input','selin');zi.type='search';zi.placeholder='naam of team';zi.value=cf.zoek;zi.style.width='150px';
+  zi.oninput=()=>{cf.zoek=zi.value;tekenLijst();};zw.appendChild(zi);fb.appendChild(zw);
+  wrap.appendChild(fb);
+  const zl=el('label','row');zl.style.margin='0 0 8px';
+  const zc=el('input');zc.type='checkbox';zc.checked=cf.zonder;zc.style.width='18px';zc.style.height='18px';
+  zc.onchange=()=>{cf.zonder=zc.checked;tekenLijst();};
+  zl.appendChild(zc);zl.appendChild(Object.assign(el('span','muted'),{textContent:'Alleen wie nog geen nummer heeft',style:'font-size:12.5px'}));
+  wrap.appendChild(zl);
+  const tel=el('div','muted');tel.style.cssText='font-size:12.5px;margin:2px 0 10px';wrap.appendChild(tel);
+  const lijst=el('div');wrap.appendChild(lijst);
+  function tekenLijst(){
+    const q=cf.zoek.trim().toLowerCase();
+    let rows=data.contacts.slice();
+    if(cf.soort)rows=rows.filter(r=>r.kind===cf.soort);
+    if(cf.groep)rows=rows.filter(r=>r.kind!=='team'||lichtingOf(r.naam)===cf.groep);
+    if(cf.groep&&!cf.soort)rows=rows.filter(r=>r.kind==='team');
+    if(q)rows=rows.filter(r=>(r.naam||'').toLowerCase().includes(q));
+    const metNr=rows.filter(r=>r.telefoon).length;
+    if(cf.zonder)rows=rows.filter(r=>!r.telefoon);
+    tel.textContent=cf.zonder?`${rows.length} zonder nummer`:`${metNr} van ${rows.length} hebben een nummer`;
+    lijst.innerHTML='';
+    if(!rows.length){lijst.appendChild(Object.assign(el('div','empty'),{textContent:'Niemand gevonden.'}));return;}
+    ['profile','staff','team'].forEach(k=>{
+      const deel=rows.filter(r=>r.kind===k);if(!deel.length)return;
+      const c=el('div','card');c.appendChild(Object.assign(el('h3'),{textContent:CSOORT[k]}));
+      deel.sort((a,b)=>(a.naam||'').localeCompare(b.naam||'',undefined,{numeric:true}))
+          .forEach(r=>c.appendChild(contactRegel(r)));
+      lijst.appendChild(c);
+    });
+  }
+  tekenLijst();
+}
+function contactRegel(r){
+  const row=el('div','list-item');row.dataset.kind=r.kind;row.dataset.ref=r.ref_id;
+  const l=el('div');
+  l.appendChild(Object.assign(el('b'),{textContent:r.naam||'—'}));
+  if(r.kind==='team')l.appendChild(Object.assign(el('div','contacttype'),{textContent:'teamleider'}));
+  else if(r.groep&&r.kind==='profile')l.appendChild(Object.assign(el('div','contacttype'),{textContent:r.groep.toLowerCase()}));
+  if(!r.telefoon)l.appendChild(Object.assign(el('div','geennr'),{textContent:'geen nummer'}));
+  row.appendChild(l);
+  const rechts=el('div','row');
+  const inp=el('input','telin');inp.type='tel';inp.inputMode='tel';inp.placeholder='06 1234 5678';inp.value=fmtTel(r.telefoon);
+  inp.onchange=async()=>{
+    const n=normTel(inp.value);
+    if(n===null){inp.classList.add('fout');saved('Dit telefoonnummer klopt niet',true);return;}
+    inp.classList.remove('fout');
+    try{const t=await authRpc('contact_set',{p_kind:r.kind,p_ref_id:r.ref_id,p_phone:n});
+      r.telefoon=t||'';r.bron='app';saved();row.replaceWith(contactRegel(r));}
+    catch(e){saved('Niet opgeslagen: '+e.message,true);inp.value=fmtTel(r.telefoon);}
+  };
+  rechts.appendChild(inp);
+  const groet=r.kind==='team'?'teamleider van '+r.naam:(r.naam||'').split(' ')[0];
+  rechts.appendChild(telKnoppen(r.telefoon,berichtAlgemeen(groet)));
+  row.appendChild(rechts);
+  return row;
 }
 function renderMijnTab(){
   const wrap=$('#content');wrap.innerHTML='';

@@ -124,7 +124,7 @@ test('het tabblad Contact toont iedereen, met wie nog geen nummer heeft', async 
   await naarTab(page, 'contact');
 
   await expect(page.locator('#content')).toContainText('2 van 5 hebben een nummer');
-  await expect(page.locator('#content .card:not(#importKaart) h3')).toHaveText(['Coördinatoren', 'Vaste krachten', 'Teamleiders']);
+  await expect(page.locator('#content .card:not(#importKaart):not(#roosterRonde) h3')).toHaveText(['Coördinatoren', 'Vaste krachten', 'Teamleiders']);
 
   await page.getByText('Alleen wie nog geen nummer heeft').click();
   await expect(page.locator('#content .list-item')).toHaveCount(3);
@@ -400,4 +400,94 @@ test('teamleider: "Deel in de teamapp" zet de open plekken automatisch in het be
   // alle verplichte plekken gevuld: de knop verdwijnt
   await page.locator('.sat .block').nth(1).locator('input[type=checkbox]').first().check();
   await expect(knop).toBeHidden();
+});
+
+// ---------- Barrooster delen met vaste krachten ----------
+
+function roosterStand(extra = {}) {
+  return stand({
+    rol: 'barco',
+    contacts: [
+      { kind: 'staff', ref_id: 'p1', naam: 'Wito', telefoon: '', knvb: '', bron: '' },
+      { kind: 'staff', ref_id: 'p2', naam: 'Els Bakker', telefoon: '+31687654321', knvb: '', bron: 'excel' },
+    ],
+    saturdays: [
+      { id: 's0', date: dag(-7), team_id: 't1', team_status: {}, label: '', blocks: null, bar_shifts: null },
+      { id: 's1', date: dag(7), team_id: 't2', team_status: {}, label: '', blocks: null, bar_shifts: null },
+      { id: 's2', date: dag(14), team_id: 't3', team_status: {}, label: 'Toernooi', blocks: null, bar_shifts: null },
+      { id: 's9', date: dag(70), team_id: 't1', team_status: {}, label: '', blocks: null, bar_shifts: null },
+    ],
+    barAssignments: [
+      { saturday_id: 's0', shift_id: 'v1', staff_id: 'p2' },   // al geweest
+      { saturday_id: 's1', shift_id: 'v1', staff_id: 'p2' },
+      { saturday_id: 's2', shift_id: 'v2', staff_id: 'p2' },
+      { saturday_id: 's2', shift_id: 'v1', staff_id: 'p1' },
+      { saturday_id: 's9', shift_id: 'v1', staff_id: 'p2' },   // verder dan 4 weken
+    ],
+    ...extra,
+  });
+}
+
+test('rooster: een vaste kracht krijgt zijn komende diensten via WhatsApp', async ({ page }) => {
+  const s = roosterStand();
+  await nepDatabase(page, s);
+  await logInMetAccount(page);
+  await naarTab(page, 'contact');
+  const knop = page.locator('.list-item[data-ref="p2"] a.roosterbtn');
+  await expect(knop).toHaveText('📅 Stuur rooster (3)');
+  const href = await knop.getAttribute('href');
+  expect(href).toMatch(/^https:\/\/wa\.me\/31687654321\?text=/);
+  const t = decodeURIComponent(href.split('text=')[1]).split('\n');
+  expect(t[0]).toBe('Hoi Els, je staat ingedeeld voor de bar:');
+  expect(t.filter((r) => r.startsWith('• '))).toHaveLength(3);          // de afgelopen dienst niet
+  expect(t[1]).toContain('Ochtend 07:30–12:00');
+  expect(t[2]).toContain('(Toernooi) — Middag 12:00–16:00');
+  // zonder nummer: knop uit
+  await expect(page.locator('.list-item[data-ref="p1"] a.roosterbtn')).toHaveClass(/uit/);
+});
+
+test('rooster: iedereen na elkaar zijn rooster sturen', async ({ page }) => {
+  const s = roosterStand({ contacts: [
+    { kind: 'staff', ref_id: 'p1', naam: 'Wito', telefoon: '+31611111111', knvb: '', bron: '' },
+    { kind: 'staff', ref_id: 'p2', naam: 'Els Bakker', telefoon: '+31687654321', knvb: '', bron: '' },
+  ] });
+  await nepDatabase(page, s);
+  await logInMetAccount(page);
+  await naarTab(page, 'contact');
+  const kaart = page.locator('#roosterRonde');
+  await expect(kaart).toContainText('2 vaste krachten met een nummer');
+  await kaart.getByRole('button', { name: 'Stuur iedereen zijn rooster' }).click();
+  await expect(kaart).toContainText('1 van 2: Els Bakker');
+  expect(await kaart.getByRole('link', { name: 'Open WhatsApp' }).getAttribute('href')).toMatch(/wa\.me\/31687654321/);
+  await kaart.getByRole('button', { name: 'Overslaan' }).click();
+  await expect(kaart).toContainText('2 van 2: Wito');
+  await kaart.getByRole('button', { name: 'Overslaan' }).click();
+  await expect(kaart).toContainText('Klaar');
+});
+
+test('rooster: het barrooster van de komende 4 weken delen in de groep', async ({ page }) => {
+  const s = roosterStand();
+  await nepDatabase(page, s);
+  await logInMetAccount(page);
+  await naarTab(page, 'overzicht');
+  const knop = page.locator('a.deelrooster');
+  await expect(knop).toBeVisible();
+  const href = await knop.getAttribute('href');
+  expect(href).toMatch(/^https:\/\/wa\.me\/\?text=/);
+  const t = decodeURIComponent(href.split('text=')[1]);
+  expect(t).toContain('Barrooster komende 4 weken:');
+  expect(t).toContain('• Ochtend 07:30–12:00: Els Bakker');
+  expect(t).toContain('• Ochtend 07:30–12:00: Wito');
+  expect(t).toContain('— Toernooi*');
+  expect(t).toContain('• Middag 12:00–16:00: nog open');
+  expect(t).toContain('Nog 1 dienst open.');
+  expect(t.match(/^\*/gm)).toHaveLength(2);   // twee zaterdagen: geen verleden, niets na 4 weken
+});
+
+test('rooster: een vaste kracht ziet de deelknop voor het barrooster niet', async ({ page }) => {
+  const s = roosterStand({ rol: 'vast' });
+  await nepDatabase(page, s);
+  await logInMetAccount(page);
+  await naarTab(page, 'overzicht');
+  await expect(page.locator('a.deelrooster')).toHaveCount(0);
 });

@@ -214,6 +214,7 @@
   .telin.fout{border-color:var(--accent)}
   .geennr{color:var(--warntext);font-size:12px}
   .contacttype{font-size:11.5px;color:var(--muted)}
+  pre.roostervb{white-space:pre-wrap;font-family:inherit;font-size:13px;background:var(--panel2,#f6f3f5);border:1px solid var(--line);border-radius:10px;padding:10px;margin:6px 0 10px}
   .dropzone{border:2px dashed var(--line);border-radius:12px;padding:22px 12px;text-align:center;font-size:13.5px;margin:4px 0 10px;transition:background .15s,border-color .15s}
   .dropzone.over{border-color:var(--accent);background:var(--warnbg)}
   .dropzone.bezig{opacity:.6}
@@ -378,6 +379,49 @@ function berichtTeamapp(s,team){
   if(extra.length)r.push('Extra hulp is welkom in '+lijstNL(extra)+'.');
   r.push('Wie kan? Laat het me weten, dan zet ik je erin.');
   return r.join('\n');
+}
+
+/* ---------- Barrooster delen met vaste krachten ---------- */
+const ROOSTER_WEKEN=4;   // hoe ver vooruit het groepsbericht kijkt
+/* komende bardiensten van één vaste kracht, in datumvolgorde */
+function dienstenVan(staffId){
+  const uit=[];
+  (data.saturdays||[]).filter(komend).slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(s=>{
+    dayShifts(s).forEach(sh=>{if((s.bar[sh.id]||[]).map(String).includes(String(staffId)))uit.push({s,sh});});
+  });
+  return uit;
+}
+function berichtRooster(staffId,naam){
+  const d=dienstenVan(staffId),voor=String(naam||'').split(' ')[0];
+  if(!d.length)return 'Hoi '+voor+', je staat op dit moment niet ingedeeld voor de bar.';
+  return ['Hoi '+voor+', je staat ingedeeld voor de bar:',
+    ...d.map(x=>'• '+fmtShort(x.s.date)+(x.s.label?' ('+x.s.label+')':'')+' — '+x.sh.label+' '+x.sh.start+'–'+x.sh.end),
+    'Kun je een keer niet? Laat het me weten.'].join('\n');
+}
+/* groepsbericht: per zaterdag wie er staat en wat er nog open is */
+function berichtBarrooster(){
+  const tot=new Date();tot.setDate(tot.getDate()+ROOSTER_WEKEN*7);const totISO=fmtISO(tot);
+  const dagen=(data.saturdays||[]).filter(s=>komend(s)&&s.date<=totISO).sort((a,b)=>a.date.localeCompare(b.date));
+  if(!dagen.length)return 'Er staan de komende '+ROOSTER_WEKEN+' weken geen dienstdagen in het rooster.';
+  const r=['Barrooster komende '+ROOSTER_WEKEN+' weken:'];
+  let open=0;
+  dagen.forEach(s=>{
+    r.push('','*'+fmtShort(s.date)+(s.label?' — '+s.label:'')+'*');
+    dayShifts(s).forEach(sh=>{
+      const ids=s.bar[sh.id]||[];if(!ids.length)open++;
+      r.push('• '+sh.label+' '+sh.start+'–'+sh.end+': '+(ids.length?ids.map(staffName).join(', '):'nog open'));
+    });
+  });
+  r.push('',open?('Nog '+open+' dienst'+(open===1?'':'en')+' open. Wie kan? Laat het me weten.'):'Alles is ingevuld, dank jullie wel!');
+  return r.join('\n');
+}
+/* deelknop: op de telefoon het deelmenu, anders WhatsApp zonder nummer */
+function deelKnop(tekstFn,label,cls){
+  const a=el('a','telbtn wa '+(cls||''));a.textContent=label;a.target='_blank';a.rel='noopener';
+  a.href=waLink('',tekstFn());
+  a.onclick=async e=>{const t=tekstFn();a.href=waLink('',t);
+    if(navigator.share){e.preventDefault();try{await navigator.share({text:t});}catch(err){}}};
+  return a;
 }
 
 /* ---------- Sessie / login ---------- */
@@ -1524,6 +1568,7 @@ function renderContactTab(){
   zl.appendChild(zc);zl.appendChild(Object.assign(el('span','muted'),{textContent:'Alleen wie nog geen nummer heeft',style:'font-size:12.5px'}));
   wrap.appendChild(zl);
   const tel=el('div','muted');tel.style.cssText='font-size:12.5px;margin:2px 0 10px';wrap.appendChild(tel);
+  wrap.appendChild(roosterRondeKaart());
   const lijst=el('div');wrap.appendChild(lijst);
   wrap.appendChild(importKaart());
   function tekenLijst(){
@@ -1548,6 +1593,41 @@ function renderContactTab(){
   }
   tekenLijst();
 }
+/* Alle vaste krachten met een nummer én een dienst één voor één hun rooster
+   sturen. Een website kan geen tien WhatsApp-berichten tegelijk openen, dus
+   je klikt per persoon; de app onthoudt waar je bent. */
+let roosterRonde=null;
+function roosterRondeKaart(){
+  const c=el('div','card');c.id='roosterRonde';
+  const lijst=(data.contacts||[]).filter(r=>r.kind==='staff'&&r.telefoon&&dienstenVan(r.ref_id).length)
+    .sort((a,b)=>(a.naam||'').localeCompare(b.naam||''));
+  const zonderNr=(data.contacts||[]).filter(r=>r.kind==='staff'&&!r.telefoon&&dienstenVan(r.ref_id).length).length;
+  if(!roosterRonde){
+    c.appendChild(Object.assign(el('h3'),{textContent:'Rooster naar de vaste krachten'}));
+    c.appendChild(Object.assign(el('p','muted'),{style:'margin:0 0 8px;font-size:12.5px',
+      textContent:lijst.length+' vaste kracht'+(lijst.length===1?'':'en')+' met een nummer en minstens één dienst.'+(zonderNr?' '+zonderNr+' ingedeeld zonder nummer.':'')}));
+    const b=el('button','btn sm');b.textContent='Stuur iedereen zijn rooster';b.disabled=!lijst.length;
+    b.onclick=()=>{roosterRonde={i:0,ids:lijst.map(r=>r.ref_id)};renderContactTab();};
+    c.appendChild(b);return c;
+  }
+  const ids=roosterRonde.ids,i=roosterRonde.i;
+  if(i>=ids.length){
+    c.appendChild(Object.assign(el('h3'),{textContent:'Klaar — '+ids.length+' rooster'+(ids.length===1?'':'s')+' klaargezet'}));
+    const k=el('button','btn ghost sm');k.textContent='Sluiten';k.onclick=()=>{roosterRonde=null;renderContactTab();};
+    c.appendChild(k);return c;
+  }
+  const r=(data.contacts||[]).find(x=>x.kind==='staff'&&x.ref_id===ids[i]);
+  c.appendChild(Object.assign(el('h3'),{textContent:(i+1)+' van '+ids.length+': '+(r?r.naam:'?')}));
+  c.appendChild(Object.assign(el('pre','roostervb'),{textContent:r?berichtRooster(r.ref_id,r.naam):''}));
+  const rij=el('div','row');
+  const ga=el('a','btn sm');ga.textContent='Open WhatsApp';ga.style.textDecoration='none';
+  if(r){ga.href=waLink(r.telefoon,berichtRooster(r.ref_id,r.naam));ga.target='_blank';ga.rel='noopener';}
+  ga.onclick=()=>{setTimeout(()=>{roosterRonde.i++;renderContactTab();},300);};
+  const sla=el('button','btn ghost sm');sla.textContent='Overslaan';sla.onclick=()=>{roosterRonde.i++;renderContactTab();};
+  const stop=el('button','btn ghost sm');stop.textContent='Stoppen';stop.onclick=()=>{roosterRonde=null;renderContactTab();};
+  rij.appendChild(ga);rij.appendChild(sla);rij.appendChild(stop);c.appendChild(rij);
+  return c;
+}
 function contactRegel(r){
   const row=el('div','list-item');row.dataset.kind=r.kind;row.dataset.ref=r.ref_id;
   const l=el('div');
@@ -1569,6 +1649,13 @@ function contactRegel(r){
   rechts.appendChild(inp);
   const groet=r.kind==='team'?'teamleider van '+r.naam:(r.naam||'').split(' ')[0];
   rechts.appendChild(telKnoppen(r.telefoon,berichtAlgemeen(groet)));
+  if(r.kind==='staff'){
+    const n=dienstenVan(r.ref_id).length;
+    const rb=el('a','telbtn wa roosterbtn'+(r.telefoon?'':' uit'));
+    rb.textContent='📅 Stuur rooster'+(n?' ('+n+')':'');rb.title='Stuur '+r.naam+' de komende bardiensten via WhatsApp';
+    if(r.telefoon){rb.href=waLink(r.telefoon,berichtRooster(r.ref_id,r.naam));rb.target='_blank';rb.rel='noopener';}
+    rechts.appendChild(rb);
+  }
   row.appendChild(rechts);
   return row;
 }
@@ -1740,6 +1827,10 @@ function renderMijnTab(){
 let adminOvSub='tot';
 function renderOverzichtTab(){
   const wrap=$('#content');wrap.innerHTML='';
+  if(session.role==='admin'||session.role==='barco'){
+    const d=deelKnop(berichtBarrooster,'📣 Deel barrooster (komende '+ROOSTER_WEKEN+' weken)','deelrooster');
+    d.style.margin='0 0 10px';wrap.appendChild(d);
+  }
   if(session.role!=='admin'){renderBarGrid(wrap);return;}
   const tg=el('div','subtabs');
   const b1=el('button');b1.textContent='Totaaloverzicht';

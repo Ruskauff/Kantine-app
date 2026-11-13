@@ -120,6 +120,14 @@ wordt kan de beheerder meteen als vaste kracht toevoegen. Regels met
 "niet meer actief" of "verlaten" in de kolom inzetbaar worden overgeslagen;
 de jeugdpoule staat standaard uit.
 
+Rooster delen met vaste krachten: in Contact staat bij elke vaste kracht
+**Stuur rooster** (al zijn komende bardiensten via WhatsApp), en bovenaan
+**Stuur iedereen zijn rooster**, dat iedereen met een nummer en een dienst
+één voor één langsloopt. Onder Overzicht zet **Deel barrooster** het rooster
+van de komende 4 weken klaar om in een groep te delen (`ROOSTER_WEKEN` in
+`index.html`). Teamleiders hebben bij hun dienstdag **Deel in de teamapp**,
+met de open plekken in het bericht.
+
 Teamleiders gaan op dezelfde manier: een kolom **Team** en bij **Rol**
 "teamleider" of "TL". Het nummer komt dan bij dat team. "O10-1" en
 "JO10-1" worden als hetzelfde team gezien. Per team is er één nummer; een

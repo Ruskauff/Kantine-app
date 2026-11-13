@@ -87,11 +87,10 @@ order by d.datum;
 
 -- ============================================================
 -- DEEL B — ECHT VERDELEN
+-- Eén enkele opdracht: alles gebeurt in één keer, of helemaal niet.
+-- Selecteer van hier tot DEEL C en klik Run.
 -- ============================================================
 
-begin;
-
-create temporary table herverdeling on commit drop as
 with instellingen as (
   select date '2026-11-21' as vanaf,
          '^jo ?(10|11|12|13|14|15|16)([^0-9]|$)'::text as teampatroon
@@ -125,30 +124,33 @@ dagen as (
          row_number() over (order by s.date::date, s.id::text) - 1 as pos
   from public.saturdays s, instellingen i
   where s.date::date >= i.vanaf
-)
-select d.id as saturday_id, r.id as team_nieuw, (d.team_nu is distinct from r.id) as wisselt
-from dagen d join rotatie r on r.pos = d.pos % r.n;
-
+),
+herverdeling as (
+  select d.id as saturday_id, r.id as team_nieuw, (d.team_nu is distinct from r.id) as wisselt
+  from dagen d join rotatie r on r.pos = d.pos % r.n
+),
 -- ruilverzoeken voor dagen die van team wisselen intrekken
-update public.swap_requests q
-   set status = 'ingetrokken',
-       barco_note = 'Rooster opnieuw verdeeld over JO10 t/m JO16',
-       decided_at = now()
- where q.status in ('open','wacht_barco')
-   and exists (select 1 from herverdeling h
-               where h.wisselt and (h.saturday_id = q.from_saturday or h.saturday_id = q.to_saturday));
-
+ingetrokken as (
+  update public.swap_requests q
+     set status = 'ingetrokken',
+         barco_note = 'Rooster opnieuw verdeeld over JO10 t/m JO16',
+         decided_at = now()
+   where q.status in ('open','wacht_barco')
+     and exists (select 1 from herverdeling h
+                 where h.wisselt and (h.saturday_id = q.from_saturday or h.saturday_id = q.to_saturday))
+  returning 1
+),
 -- nieuw team; namen alleen wissen als het team echt wisselt
-update public.saturdays s
-   set team_id = h.team_nieuw, team_status = '{}'::jsonb
-  from herverdeling h
- where s.id::text = h.saturday_id and h.wisselt;
-
-select count(*) filter (where wisselt) as dagen_gewisseld,
-       count(*) filter (where not wisselt) as dagen_ongewijzigd
-from herverdeling;
-
-commit;
+bijgewerkt as (
+  update public.saturdays s
+     set team_id = h.team_nieuw, team_status = '{}'::jsonb
+    from herverdeling h
+   where s.id::text = h.saturday_id and h.wisselt
+  returning 1
+)
+select (select count(*) from bijgewerkt)                          as dagen_gewisseld,
+       (select count(*) from herverdeling where not wisselt)      as dagen_ongewijzigd,
+       (select count(*) from ingetrokken)                         as ruilverzoeken_ingetrokken;
 
 
 -- ============================================================

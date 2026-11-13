@@ -3,3 +3,5 @@ test-results/
 playwright-report/
 blob-report/
 .DS_Store
+# bevat telefoonnummers, hoort niet in de repo
+*telefoons-import.sql

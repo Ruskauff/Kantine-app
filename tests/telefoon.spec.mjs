@@ -300,3 +300,39 @@ test('import: alles aanvinken werkt per groep', async ({ page }) => {
   await gekoppeld.getByRole('button', { name: 'Alles uitvinken' }).click();
   await expect(page.getByRole('button', { name: 'Niets geselecteerd' })).toBeDisabled();
 });
+
+test('import: teamleiders gaan naar hun team, ook als het team als O10-1 in de Excel staat', async ({ page }) => {
+  const s = stand({ rol: 'barco', contacts: [
+    { kind: 'team', ref_id: 't1', naam: 'JO10-1', telefoon: '', knvb: '', bron: '' },
+    { kind: 'team', ref_id: 't2', naam: 'JO10-2', telefoon: '+31699999999', knvb: '', bron: 'app' },
+    { kind: 'team', ref_id: 't3', naam: 'MO10-1', telefoon: '', knvb: '', bron: '' },
+    { kind: 'staff', ref_id: 'p1', naam: 'Kees Phielix', telefoon: '', knvb: '', bron: '' },
+  ] });
+  const csv = [
+    'Team;Rol;Roepnaam;Tussenvoegsel;Achternaam;Telefoon;KNVB bondsnummer',
+    'O10-1;teamleider;Marcel;;Remak;06-11111111;THVG79Y',
+    'O10-1;teamleider;Tweede;;Leider;06-22222222;',
+    'JO10-2;TL;Oktay;;Özcan;06-33333333;',
+    'O10-9;teamleider;Nergens;;Team;06-44444444;',
+    'JO11-3;Barvrijwilliger;Kees;;Phielix;06-55555555;',   // team-kolom, maar geen teamleider
+  ].join('\n');
+  await nepDatabase(page, s);
+  await logInMetAccount(page);
+  await naarTab(page, 'contact');
+  await page.locator('#importKaart input[type=file]').setInputFiles({ name: 'tl.csv', mimeType: 'text/csv', buffer: Buffer.from(csv) });
+  await page.locator('#importKaart').getByRole('button', { name: 'Inlezen' }).click();
+
+  await expect(rij(page, 2)).toContainText('→ teamleider JO10-1');
+  await expect(rij(page, 2).locator('input[type=checkbox]')).toBeChecked();
+  await expect(rij(page, 3)).toHaveAttribute('data-status', 'overslaan');      // tweede TL
+  await expect(rij(page, 4).locator('input[type=checkbox]')).not.toBeChecked(); // zelf ingevuld
+  await expect(rij(page, 5)).toHaveAttribute('data-status', 'geen');
+  await expect(rij(page, 5).locator('input[type=checkbox]')).toHaveCount(0);   // geen "toevoegen als vaste kracht"
+  await expect(rij(page, 6)).toContainText('Kees Phielix');
+  await page.getByRole('button', { name: 'Opslaan (2)' }).click();
+  await expect.poll(() => s.rpc.filter((r) => r.fn === 'contact_import').length).toBe(1);
+  expect(s.rpc.find((r) => r.fn === 'contact_import').body.p_rows).toEqual([
+    { kind: 'team', ref_id: 't1', telefoon: '+31611111111', knvb: 'THVG79Y' },
+    { kind: 'staff', ref_id: 'p1', telefoon: '+31655555555', knvb: '' },
+  ]);
+});

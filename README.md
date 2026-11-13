@@ -120,6 +120,11 @@ wordt kan de beheerder meteen als vaste kracht toevoegen. Regels met
 "niet meer actief" of "verlaten" in de kolom inzetbaar worden overgeslagen;
 de jeugdpoule staat standaard uit.
 
+Teamleiders gaan op dezelfde manier: een kolom **Team** en bij **Rol**
+"teamleider" of "TL". Het nummer komt dan bij dat team. "O10-1" en
+"JO10-1" worden als hetzelfde team gezien. Per team is er één nummer; een
+tweede teamleider van hetzelfde team wordt overgeslagen.
+
 De standaardteksten van de berichten (`berichtOpenDienst` en `berichtAlgemeen`
 in `index.html`) zijn nog voorlopig.
 

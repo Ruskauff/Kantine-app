@@ -1545,6 +1545,9 @@ function contactRegel(r){
    Niets wordt opgeslagen voordat je het overzicht hebt gezien. */
 const IMP_SKIP=/niet meer actief|verlaten|gestopt/i;
 const naamSleutel=s=>String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
+/* "JO10-1", "jo 10-1" en "O10-1" zijn hetzelfde team; "MO10-1" niet */
+const teamSleutel=s=>String(s||'').toLowerCase().replace(/\s+/g,'').replace(/^j(?=o\d)/,'');
+const IMP_TL=/(^|[^a-z])tl([^a-z]|$)|teamleider/i;
 function koppelImport(rijen,contacten){
   const kand=(contacten||[]).filter(c=>c.kind==='staff'||c.kind==='profile');
   const perNaam=new Map();kand.forEach(c=>{const k=naamSleutel(c.naam);if(!perNaam.has(k))perNaam.set(k,[]);perNaam.get(k).push(c);});
@@ -1553,14 +1556,28 @@ function koppelImport(rijen,contacten){
     const naam=String(r.naam||r.name||[r.roepnaam,r.tv||r.tussenvoegsel,r.achternaam].filter(Boolean).join(' ')).replace(/\s+/g,' ').trim();
     const ruw=r.telefoon||r.telefoonnummer||r.tel||r.mobiel||r['mobiel nummer']||'';
     const knvb=String(r['knvb bondsnummer']||r.knvb||r.bondsnummer||'').trim();
-    const functie=String(r.functie||'').trim(), inzet=String(r.inzetbaar||'').trim();
-    return {rij:i+2,naam,roep:roep||naam.split(' ')[0]||'',functie,inzet,ruw:String(ruw),telefoon:normTel(ruw),knvb};
+    const functie=String(r.functie||r.rol||'').trim(), inzet=String(r.inzetbaar||'').trim();
+    // een regel met een team én de rol teamleider gaat naar dat team
+    const team=IMP_TL.test(functie)?String(r.team||'').trim():'';
+    return {rij:i+2,naam,roep:roep||naam.split(' ')[0]||'',functie,inzet,team,ruw:String(ruw),telefoon:normTel(ruw),knvb};
   }).filter(x=>x.naam);
   const roepTel=new Map();regels.forEach(x=>{const k=naamSleutel(x.roep);roepTel.set(k,(roepTel.get(k)||0)+1);});
+  const teams=new Map();(contacten||[]).filter(c=>c.kind==='team').forEach(c=>teams.set(teamSleutel(c.naam),c));
+  const teamGehad=new Set();
   return regels.map(x=>{
     const o={...x,status:'',reden:'',match:null,aan:false,toevoegen:false};
     if(IMP_SKIP.test(x.inzet)){o.status='overslaan';o.reden='inzetbaar: '+x.inzet;return o;}
     if(!x.telefoon){o.status='overslaan';o.reden=x.ruw?'telefoonnummer klopt niet':'geen telefoonnummer';return o;}
+    if(x.team){
+      const t=teams.get(teamSleutel(x.team));
+      if(!t){o.status='geen';o.reden='team '+x.team+' niet gevonden in de app';return o;}
+      if(teamGehad.has(t.ref_id)){o.status='overslaan';o.reden='tweede teamleider van '+t.naam+' — per team is er één nummer';return o;}
+      teamGehad.add(t.ref_id);
+      o.match=t;o.matches=[t];o.status='koppel';
+      if(t.telefoon===x.telefoon){o.status='gelijk';o.reden='nummer is al gelijk';return o;}
+      if(t.telefoon&&t.bron==='app'){o.reden='teamleider vulde zelf in: '+fmtTel(t.telefoon)+' — blijft staan tenzij je aanvinkt';return o;}
+      o.aan=true;return o;
+    }
     let m=perNaam.get(naamSleutel(x.naam))||[];
     if(!m.length&&roepTel.get(naamSleutel(x.roep))===1)m=perNaam.get(naamSleutel(x.roep))||[];
     // dezelfde naam als vaste kracht én als coördinator is één persoon in twee rollen;
@@ -1578,7 +1595,7 @@ function koppelImport(rijen,contacten){
 let importVoorbeeld=null;
 function importKaart(){
   const c=el('div','card');c.id='importKaart';
-  c.innerHTML='<h3>Nummers bijwerken uit Excel</h3><p class="muted" style="margin:0 0 8px;font-size:12.5px">Bijvoorbeeld de lijst met barvrijwilligers. Kolommen: <b>Roepnaam</b>, <b>Tv</b>, <b>Achternaam</b> (of één kolom <b>Naam</b>) en <b>Telefoon</b>. <b>KNVB bondsnummer</b> en <b>inzetbaar</b> worden meegenomen als ze er zijn. Je ziet eerst wat er gebeurt; pas daarna wordt er iets opgeslagen.</p>';
+  c.innerHTML='<h3>Nummers bijwerken uit Excel</h3><p class="muted" style="margin:0 0 8px;font-size:12.5px">Bijvoorbeeld de lijst met barvrijwilligers. Kolommen: <b>Roepnaam</b>, <b>Tv</b>, <b>Achternaam</b> (of één kolom <b>Naam</b>) en <b>Telefoon</b>. <b>KNVB bondsnummer</b> en <b>inzetbaar</b> worden meegenomen als ze er zijn. Teamleiders: een kolom <b>Team</b> en bij <b>Rol</b> “teamleider” of “TL”; het nummer komt dan bij dat team. Je ziet eerst wat er gebeurt; pas daarna wordt er iets opgeslagen.</p>';
   const r=el('div','row');
   const fi=el('input');fi.type='file';fi.accept='.xlsx,.xls,.csv';
   const b=el('button','btn sm');b.textContent='Inlezen';
@@ -1613,7 +1630,7 @@ function renderImportVoorbeeld(wrap){
   const sectie=(titel,rijen,vinkbaar)=>{
     if(!rijen.length)return;
     const c=el('div','card');c.appendChild(Object.assign(el('h3'),{textContent:titel+' ('+rijen.length+')'}));
-    const vinkVeld=x=>vinkbaar==='koppel'?'aan':(vinkbaar==='toevoegen'&&x.status==='geen')?'toevoegen':null;
+    const vinkVeld=x=>vinkbaar==='koppel'?'aan':(vinkbaar==='toevoegen'&&x.status==='geen'&&!x.team)?'toevoegen':null;
     const vinkRijen=rijen.filter(vinkVeld);
     if(vinkRijen.length>1){
       const alles=el('button','btn ghost sm');alles.style.marginBottom='6px';
@@ -1628,7 +1645,8 @@ function renderImportVoorbeeld(wrap){
       l.appendChild(Object.assign(el('b'),{textContent:x.naam}));
       const sub=[x.functie,x.telefoon?fmtTel(x.telefoon):''].filter(Boolean).join(' · ');
       if(sub)l.appendChild(Object.assign(el('div','contacttype'),{textContent:sub}));
-      if(x.match&&naamSleutel(x.match.naam)!==naamSleutel(x.naam))l.appendChild(Object.assign(el('div','contacttype'),{textContent:'→ '+x.match.naam+' (op roepnaam)'}));
+      if(x.team&&x.match)l.appendChild(Object.assign(el('div','contacttype'),{textContent:'→ teamleider '+x.match.naam}));
+      else if(x.match&&naamSleutel(x.match.naam)!==naamSleutel(x.naam))l.appendChild(Object.assign(el('div','contacttype'),{textContent:'→ '+x.match.naam+' (op roepnaam)'}));
       if(x.reden)l.appendChild(Object.assign(el('div','geennr'),{textContent:x.reden}));
       row.appendChild(l);
       const veld=vinkVeld(x);

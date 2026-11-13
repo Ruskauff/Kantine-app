@@ -360,11 +360,24 @@ function berichtOpenDienst(s,team){
     +(open.length?open.join(', '):'—')+'. Wil je ze invullen in de app? '+APP_URL;
 }
 function berichtAlgemeen(naam){return 'Hoi '+(naam||'')+', ';}
-/* teamleider -> eigen teamgroep: welke blokken nog open staan */
+/* teamleider -> eigen teamgroep: de open verplichte plekken als lijst,
+   de open optionele plekken in één regel "extra hulp welkom" */
+const lijstNL=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+' en '+a[a.length-1];
+const taakKort=t=>String(t||'').replace(/\s*\((verplicht|optioneel)\)\s*/ig,' ').trim().toLowerCase();
 function berichtTeamapp(s,team){
-  const open=dayBlocks(s).filter(b=>!blokTelling(s,b).rond).map(b=>b.label+' ('+b.start+'–'+b.end+')');
-  return capF(fmtDay(s.date))+' hebben wij ('+team+') kantinedienst. Nog open: '
-    +(open.length?open.join(', '):'—')+'. Wie kan? Laat het me weten, dan zet ik je erin.';
+  const verplicht=[],extra=[];
+  dayBlocks(s).forEach(b=>{
+    const a=blockArr(s.team_status,b);
+    const open=b.tasks.filter((t,i)=>!(a[i]&&a[i].done)&&!taakOptioneel(t)).map(taakKort);
+    if(open.length)verplicht.push('• '+b.label+' ('+b.start+'–'+b.end+'): '+[...new Set(open)].join(', '));
+    if(b.tasks.some((t,i)=>!(a[i]&&a[i].done)&&taakOptioneel(t)))extra.push(b.label);
+  });
+  const r=[capF(fmtDay(s.date))+' hebben wij ('+team+') kantinedienst.'];
+  if(verplicht.length)r.push('Nog open:',...verplicht);
+  else r.push('Alle verplichte plekken zijn gevuld.');
+  if(extra.length)r.push('Extra hulp is welkom in '+lijstNL(extra)+'.');
+  r.push('Wie kan? Laat het me weten, dan zet ik je erin.');
+  return r.join('\n');
 }
 
 /* ---------- Sessie / login ---------- */

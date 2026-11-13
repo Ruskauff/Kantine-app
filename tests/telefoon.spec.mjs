@@ -370,26 +370,34 @@ test('import: een ander soort bestand slepen wordt geweigerd', async ({ page }) 
   await expect(page.locator('#importKaart')).toBeVisible();
 });
 
-test('teamleider: "Deel in de teamapp" zet een bericht met de open blokken klaar', async ({ page }) => {
+test('teamleider: "Deel in de teamapp" zet de open plekken automatisch in het bericht', async ({ page }) => {
   const s = stand();
   await nepDatabase(page, s);
   await logInAlsTeam(page);
   const knop = page.locator('a.deelteam').first();
+  const bericht = async () => decodeURIComponent((await knop.getAttribute('href')).split('text=')[1]);
   await expect(knop).toBeVisible();
-  const href = await knop.getAttribute('href');
-  expect(href).toMatch(/^https:\/\/wa\.me\/\?text=/);   // geen nummer: zelf de groep kiezen
-  const tekst = decodeURIComponent(href.split('text=')[1]);
-  expect(tekst).toContain('JO11-1');
-  expect(tekst).toContain('Blok 1 (08:00–11:00)');
-  expect(tekst).toContain('Blok 2 (11:00–14:00)');
+  expect(await knop.getAttribute('href')).toMatch(/^https:\/\/wa\.me\/\?text=/);   // geen nummer: zelf de groep kiezen
 
-  // blok 1 invullen: het bericht noemt alleen nog blok 2
+  let t = (await bericht()).split('\n');
+  expect(t[0]).toMatch(/hebben wij \(JO11-1\) kantinedienst\.$/);
+  expect(t).toContain('Nog open:');
+  expect(t).toContain('• Blok 1 (08:00–11:00): bar');
+  expect(t).toContain('• Blok 2 (11:00–14:00): bar');
+  expect(t).toContain('Extra hulp is welkom in Blok 1 en Blok 2.');
+  expect(t.at(-1)).toBe('Wie kan? Laat het me weten, dan zet ik je erin.');
+
+  // verplichte plek in blok 1 ingevuld: blok 1 staat niet meer in de lijst
   await page.locator('.sat .block').first().locator('input[type=checkbox]').first().check();
-  const na = decodeURIComponent((await knop.getAttribute('href')).split('text=')[1]);
-  expect(na).not.toContain('Blok 1');
-  expect(na).toContain('Blok 2');
+  t = (await bericht()).split('\n');
+  expect(t.some((r) => r.startsWith('• Blok 1'))).toBe(false);
+  expect(t).toContain('• Blok 2 (11:00–14:00): bar');
 
-  // alles rond: de knop verdwijnt
+  // optionele plek in blok 1 ook gevuld: extra hulp alleen nog in blok 2
+  await page.locator('.sat .block').first().locator('input[type=checkbox]').nth(1).check();
+  expect((await bericht()).split('\n')).toContain('Extra hulp is welkom in Blok 2.');
+
+  // alle verplichte plekken gevuld: de knop verdwijnt
   await page.locator('.sat .block').nth(1).locator('input[type=checkbox]').first().check();
   await expect(knop).toBeHidden();
 });

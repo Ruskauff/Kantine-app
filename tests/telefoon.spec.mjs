@@ -491,3 +491,48 @@ test('rooster: een vaste kracht ziet de deelknop voor het barrooster niet', asyn
   await naarTab(page, 'overzicht');
   await expect(page.locator('a.deelrooster')).toHaveCount(0);
 });
+
+// ---------- Rooster JO10 t/m JO16 en noodoproep ----------
+
+test('rotatie: alleen JO10 t/m JO16, lichtingen gemengd zoals de SQL', async ({ page }) => {
+  await page.goto('/');
+  const volgorde = await page.evaluate(() => rotatieTeams([
+    'JO7-1', 'JO9-2', 'JO10-1', 'JO10-2', 'JO11-1', 'JO12-1', 'JO13-1', 'JO14-1', 'JO15-1', 'JO16-1', 'JO16-2',
+    'JO17-1', 'JO19-1', 'MO13-1', 'MO15-1', 'Zaterdag 1', 'JO 12-2',
+  ].map((name, i) => ({ id: 'x' + i, name }))).map((t) => t.name));
+  expect(volgorde).toEqual([
+    // ronde 1: JO10, JO16, JO11, JO15, JO12, JO14, JO13
+    'JO10-1', 'JO16-1', 'JO11-1', 'JO15-1', 'JO12-1', 'JO14-1', 'JO13-1',
+    // ronde 2: alleen lichtingen met een tweede team
+    'JO10-2', 'JO16-2', 'JO 12-2',
+  ]);
+});
+
+test('noodoproep: teamleiders buiten het rooster één voor één, met wat er open is', async ({ page }) => {
+  const s = stand({
+    rol: 'barco',
+    teams: [{ id: 'a', name: 'JO12-1', sort: 1 }, { id: 'j9', name: 'JO9-1', sort: 2 }, { id: 'j17', name: 'JO17-1', sort: 3 }, { id: 'm', name: 'MO13-1', sort: 4 }],
+    saturdays: [{ id: 's1', date: dag(7), team_id: 'a', team_status: { b1: [{ done: true, name: 'A' }, { done: false, name: '' }] }, label: '', blocks: null, bar_shifts: null }],
+    contacts: [
+      { kind: 'team', ref_id: 'a', naam: 'JO12-1', telefoon: '+31611111111', knvb: '', bron: '' },   // in het rooster: niet
+      { kind: 'team', ref_id: 'j9', naam: 'JO9-1', telefoon: '+31622222222', knvb: '', bron: '' },
+      { kind: 'team', ref_id: 'j17', naam: 'JO17-1', telefoon: '+31633333333', knvb: '', bron: '' },
+      { kind: 'team', ref_id: 'm', naam: 'MO13-1', telefoon: '', knvb: '', bron: '' },               // geen nummer: niet
+    ],
+  });
+  await nepDatabase(page, s);
+  await logInMetAccount(page);
+  await page.locator('.sathead').first().click();
+  await page.getByRole('button', { name: '🚨 Noodoproep aan andere teams' }).click();
+
+  const kaart = page.locator('#roosterRonde');
+  await expect(page.locator('#navbar button[data-tab="contact"]')).toHaveClass(/on/);
+  await expect(kaart).toContainText('Noodoproep');
+  await expect(kaart).toContainText('1 van 2: teamleider JO9-1');
+  const t = decodeURIComponent((await kaart.getByRole('link', { name: 'Open WhatsApp' }).getAttribute('href')).split('text=')[1]);
+  expect(t).toContain('noodoproep voor de kantine');
+  expect(t).toContain('• Blok 2 (11:00–14:00): bar');
+  expect(t).not.toContain('Blok 1');                       // blok 1 is al ingevuld
+  await kaart.getByRole('button', { name: 'Overslaan' }).click();
+  await expect(kaart).toContainText('2 van 2: teamleider JO17-1');
+});

@@ -1,8 +1,12 @@
 # Kantinediensten Arnhemse Boys
 
 De app waarmee kaders de bardiensten van hun team invullen, plus de controles
-erop. Kantinedienst geldt voor de teams onder JO17 (JO7 t/m JO16 en de
-MO-teams in dezelfde leeftijden).
+erop. Kantinedienst draaien de teams **JO10 t/m JO16** (besluit commissie
+13-11-2026). Jongere en oudere teams en de MO-teams doen niet mee in het
+rooster; die benader je alleen bij nood, met de knop **Noodoproep aan andere
+teams** bij een dienstdag die nog niet rond is. Welke teams meedoen staat op
+één plek in `index.html` (`ROOSTER_PATROON`) en in
+`sql/rooster-herverdelen-jo10-jo16.sql`.
 
 ## Wat staat waar
 
@@ -138,9 +142,10 @@ in `index.html`) zijn nog voorlopig.
 
 ## Nog te doen
 
-- `sql/rooster-pilot-2026.sql` is nog niet uitgevoerd. Het vult 7 november
-  t/m 12 december voor JO10 t/m JO15 en MO10 t/m MO15. Let op: het wist eerst
-  alles, dus voer eerst alleen deel A uit.
+- `sql/rooster-herverdelen-jo10-jo16.sql` verdeelt de dienstdagen vanaf
+  21 november opnieuw over JO10 t/m JO16. Eerst deel A (overzicht), dan B,
+  dan C. `sql/rooster-pilot-2026.sql` (JO10–JO15 plus MO, wist alles) niet
+  meer gebruiken.
 - Het subdomein `kantine.arnhemseboys.nl` is nog niet gekoppeld. Het DNS van
   `arnhemseboys.nl` zit niet bij Netlify of Cloudflare maar bij de hoster van
   de clubsite; daar is één CNAME-regel nodig.

@@ -25,7 +25,14 @@ test('een datum die geen zaterdag is wordt gemeld', async ({ page }) => {
 });
 
 test('dienstdagen worden stuk voor stuk aangemaakt en de teams rouleren door', async ({ page }) => {
-  const s = stand();
+  // alleen JO10 t/m JO16 doen mee (besluit commissie 13-11-2026); MO, jonger en ouder niet
+  const s = stand({
+    teams: [
+      { id: 'j9', name: 'JO9-1', sort: 1 }, { id: 'a', name: 'JO10-1', sort: 2 }, { id: 'b', name: 'JO10-2', sort: 3 },
+      { id: 'c', name: 'JO16-1', sort: 4 }, { id: 'j17', name: 'JO17-1', sort: 5 }, { id: 'm13', name: 'MO13-1', sort: 6 },
+    ],
+    saturdays: [],
+  });
   page.on('dialog', (d) => d.accept());
   await nepDatabase(page, s);
   await logInMetAccount(page);
@@ -33,14 +40,15 @@ test('dienstdagen worden stuk voor stuk aangemaakt en de teams rouleren door', a
 
   const kaart = page.locator('.card', { hasText: 'Zaterdagen genereren' });
   await kaart.locator('input[type=date]').fill(komendeZaterdag());
-  await kaart.locator('input[type=number]').fill('3');
+  await expect(kaart).toContainText('Om de beurt: 3 teams (JO10 t/m JO16)');
+  await kaart.locator('input[type=number]').fill('4');
   await kaart.getByRole('button', { name: 'Genereren' }).click();
 
-  await expect.poll(() => s.posts.filter((p) => p.tabel === 'saturdays').length).toBe(3);
+  await expect.poll(() => s.posts.filter((p) => p.tabel === 'saturdays').length).toBe(4);
 
   const dagen = s.posts.filter((p) => p.tabel === 'saturdays');
-  // de laatste bestaande dienstdag was van t3, dus hierna is t1 weer aan de beurt
-  expect(dagen.map((d) => d.body.team_id)).toEqual(['t1', 't2', 't3']);
+  // lichtingen gemengd: JO10-1, JO16-1, dan de tweede ronde JO10-2, en weer vooraan
+  expect(dagen.map((d) => d.body.team_id)).toEqual(['a', 'c', 'b', 'a']);
 });
 
 test('als één datum al bestaat gaan de andere gewoon door', async ({ page }) => {

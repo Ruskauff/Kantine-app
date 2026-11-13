@@ -214,6 +214,9 @@
   .telin.fout{border-color:var(--accent)}
   .geennr{color:var(--warntext);font-size:12px}
   .contacttype{font-size:11.5px;color:var(--muted)}
+  .dropzone{border:2px dashed var(--line);border-radius:12px;padding:22px 12px;text-align:center;font-size:13.5px;margin:4px 0 10px;transition:background .15s,border-color .15s}
+  .dropzone.over{border-color:var(--accent);background:var(--warnbg)}
+  .dropzone.bezig{opacity:.6}
 </style>
 
 <div id="login">
@@ -1596,19 +1599,31 @@ let importVoorbeeld=null;
 function importKaart(){
   const c=el('div','card');c.id='importKaart';
   c.innerHTML='<h3>Nummers bijwerken uit Excel</h3><p class="muted" style="margin:0 0 8px;font-size:12.5px">Bijvoorbeeld de lijst met barvrijwilligers. Kolommen: <b>Roepnaam</b>, <b>Tv</b>, <b>Achternaam</b> (of één kolom <b>Naam</b>) en <b>Telefoon</b>. <b>KNVB bondsnummer</b> en <b>inzetbaar</b> worden meegenomen als ze er zijn. Teamleiders: een kolom <b>Team</b> en bij <b>Rol</b> “teamleider” of “TL”; het nummer komt dan bij dat team. Je ziet eerst wat er gebeurt; pas daarna wordt er iets opgeslagen.</p>';
+  // slepen en neerzetten: handig als de bestandskiezer het bestand niet laat zien
+  const zone=el('div','dropzone');zone.id='importZone';
+  zone.innerHTML='<b>Sleep je Excel- of CSV-bestand hierheen</b><br><span class="muted">of kies hieronder een bestand</span>';
+  c.appendChild(zone);
   const r=el('div','row');
   const fi=el('input');fi.type='file';fi.accept='.xlsx,.xls,.csv';
   const b=el('button','btn sm');b.textContent='Inlezen';
-  b.onclick=async()=>{
-    if(!fi.files||!fi.files[0]){saved('Kies een bestand',true);return;}
-    b.disabled=true;b.textContent='Bezig…';
+  const lees=async file=>{
+    if(!file){saved('Kies een bestand',true);return;}
+    if(!/\.(xlsx|xls|csv)$/i.test(file.name)){saved('Alleen Excel (.xlsx, .xls) of CSV',true);return;}
+    b.disabled=true;b.textContent='Bezig…';zone.classList.add('bezig');
     try{
-      const rijen=await parseSheet(fi.files[0]);
+      const rijen=await parseSheet(file);
       if(!rijen.length)throw new Error('geen rijen gevonden');
-      importVoorbeeld={bestand:fi.files[0].name,regels:koppelImport(rijen,data.contacts)};
+      importVoorbeeld={bestand:file.name,regels:koppelImport(rijen,data.contacts)};
       renderContactTab();window.scrollTo(0,0);
-    }catch(e){saved('Inlezen mislukt: '+e.message,true);b.disabled=false;b.textContent='Inlezen';}
+    }catch(e){saved('Inlezen mislukt: '+e.message,true);b.disabled=false;b.textContent='Inlezen';zone.classList.remove('bezig');}
   };
+  b.onclick=()=>lees(fi.files&&fi.files[0]);
+  ['dragenter','dragover'].forEach(t=>zone.addEventListener(t,e=>{e.preventDefault();zone.classList.add('over');}));
+  ['dragleave','dragend'].forEach(t=>zone.addEventListener(t,()=>zone.classList.remove('over')));
+  zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('over');
+    const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];lees(f);});
+  // net naast het vak loslaten mag de app niet wegklikken naar het bestand
+  if(!window._dropVang){window._dropVang=true;['dragover','drop'].forEach(t=>window.addEventListener(t,e=>{if(!e.target.closest||!e.target.closest('#importZone'))e.preventDefault();}));}
   r.appendChild(fi);r.appendChild(b);c.appendChild(r);
   return c;
 }

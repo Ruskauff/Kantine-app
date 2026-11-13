@@ -336,3 +336,33 @@ test('import: teamleiders gaan naar hun team, ook als het team als O10-1 in de E
     { kind: 'staff', ref_id: 'p1', telefoon: '+31655555555', knvb: '' },
   ]);
 });
+
+test('import: een bestand op het vak slepen leest het meteen in', async ({ page }) => {
+  const s = stand({ rol: 'barco', contacts: IMPORT_CONTACTEN });
+  await nepDatabase(page, s);
+  await logInMetAccount(page);
+  await naarTab(page, 'contact');
+  await page.evaluate((csv) => {
+    const dt = new DataTransfer();
+    dt.items.add(new File([csv], 'gesleept.csv', { type: 'text/csv' }));
+    const zone = document.querySelector('#importZone');
+    zone.dispatchEvent(new DragEvent('dragover', { dataTransfer: dt, bubbles: true, cancelable: true }));
+    zone.dispatchEvent(new DragEvent('drop', { dataTransfer: dt, bubbles: true, cancelable: true }));
+  }, CSV);
+  await expect(page.locator('#content')).toContainText('Overzicht: gesleept.csv');
+  await expect(page.locator('#content')).toContainText('5 gekoppeld');
+});
+
+test('import: een ander soort bestand slepen wordt geweigerd', async ({ page }) => {
+  const s = stand({ rol: 'barco', contacts: IMPORT_CONTACTEN });
+  await nepDatabase(page, s);
+  await logInMetAccount(page);
+  await naarTab(page, 'contact');
+  await page.evaluate(() => {
+    const dt = new DataTransfer();
+    dt.items.add(new File(['x'], 'foto.jpg', { type: 'image/jpeg' }));
+    document.querySelector('#importZone').dispatchEvent(new DragEvent('drop', { dataTransfer: dt, bubbles: true, cancelable: true }));
+  });
+  await expect(page.locator('#saving')).toContainText('Alleen Excel');
+  await expect(page.locator('#importKaart')).toBeVisible();
+});
